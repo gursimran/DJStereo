@@ -12,7 +12,7 @@ int k = 0;
 alt_up_audio_dev * audio_dev=NULL;
 
 int number_bytes=0;
-int readWavFromSDCARD(char *name, char *levelBricksToDraw);
+int readWavFromSDCARD(char *name, unsigned char *levelBricksToDraw);
 void configure_audio();
 unsigned int * read_wav(char *name);
 void play_wav();
@@ -32,50 +32,6 @@ static void init_button_pio(unsigned int * temp_array)
 }
 
 
-//int main() {
-//
-//	 int ding;
-//	 int miss;
-//	 int laser;
-//	 int boing;
-//	 configure_audio(); //new1
-//	 init_button_pio();
-//
-//	 unsigned int * temp_array;
-//	 temp_array = (int *) malloc((number_bytes / 2) * sizeof(int));
-//
-//	 temp_array_play =(int *) malloc((100000) * sizeof(int));
-//
-//	 temp_array=read_wav("dingding.wav");
-//	 ding=size_wav;
-//
-//
-//	 temp_array_play=temp_array;
-//	 size=ding;
-//	 alt_up_audio_enable_write_interrupt(audio_dev);
-//
-////////////////////////////
-//	 usleep(500000);
-//	 unsigned int * temp_array2;
-//	 temp_array2 = (int *) malloc((100000) * sizeof(int));
-//	 temp_array2=read_wav("boing.wav");
-//	 boing=size_wav;
-//
-//	 temp_array_play=temp_array2;
-//	 size=boing;
-//	 alt_up_audio_enable_write_interrupt(audio_dev);
-//
-//
-///////////////////////////////
-//
-//	 temp_array_play=temp_array2;
-//	 size=boing;
-//	 alt_up_audio_enable_write_interrupt(audio_dev);
-//
-//
-//
-//}
-
 void play_wav(unsigned int * temp_array) {
 
 
@@ -86,11 +42,12 @@ void play_wav(unsigned int * temp_array) {
 
 		if (k >= size) {
 			k = 0;
-			alt_up_audio_disable_write_interrupt(audio_dev);
+			//alt_up_audio_disable_write_interrupt(audio_dev);
 			alt_up_audio_reset_audio_core(audio_dev);
+			//printf("\n");
 		} else
 			k += 100;
-
+			//printf("%d",k);
 
 }
 
@@ -103,13 +60,11 @@ unsigned int * read_wav(char *name)
 	fileopen = readWavFromSDCARD(name, levelBricksToDraw);
 
 	unsigned int * temp_array;
-	temp_array = (int *) malloc((number_bytes / 2) * sizeof(int));
+	temp_array = (unsigned int *) malloc((fileopen / 2) * sizeof(unsigned int));
 	int x;
 	int y = 0;
 	for (x = 0; x < number_bytes; x += 2) {
-		unsigned int sample = (levelBricksToDraw[x + 1] << 8
-				| levelBricksToDraw[x]) << 8; //original
-		//int sample = (levelBricksToDraw[x + 1] <<8 | levelBricksToDraw[x])<<8;
+		unsigned int sample = (levelBricksToDraw[x + 1] << 8 | levelBricksToDraw[x]) << 8; //original
 		temp_array[y] = sample;
 		y++;
 	}
@@ -118,13 +73,13 @@ unsigned int * read_wav(char *name)
 }
 
 /////////////////////////////////////////*******?//////////////////////////////////////////////
-int readWavFromSDCARD(char * name, char *levelBricksToDraw) {
+int readWavFromSDCARD(char * name, unsigned char *levelBricksToDraw) {
 	// Create row an column variables for iteration
 	int row, column, i, j = 0;
 
 	// Variables needed for sdcard reading
 	int fileHandle;
-	int dataRead;
+	 short dataRead;
 	//int number_bytes = 0;
 
 	// File name to be opened
@@ -151,17 +106,6 @@ int readWavFromSDCARD(char * name, char *levelBricksToDraw) {
 		}
 	}
 
-	// Get file handle
-	fileHandle = alt_up_sd_card_fopen("README.txt", false);
-	while (1) {
-		dataRead = alt_up_sd_card_read(fileHandle);
-		if (dataRead < 0) {
-			break;
-		} else {
-			printf("%c", dataRead);
-		}
-	}
-	alt_up_sd_card_fclose(fileHandle);
 
 	fileHandle = alt_up_sd_card_fopen(name, false);
 
@@ -171,16 +115,9 @@ int readWavFromSDCARD(char * name, char *levelBricksToDraw) {
 	// Keep reading till eof
 	while (dataRead > -1) {
 		number_bytes++;
-		// If new line character then write data to next line
-		// and (increment column)
-
-		//map[row][column]= atoi(&dataRead);
 		levelBricksToDraw[j] = dataRead;
 		j++;
-		//printf("%d", map[row][column]);
 		dataRead = alt_up_sd_card_read(fileHandle);
-		//printf("Dataread: %02x\n", dataRead );
-
 	}
 
 	printf("number of reads: %d\n", number_bytes);
@@ -189,15 +126,14 @@ int readWavFromSDCARD(char * name, char *levelBricksToDraw) {
 	return number_bytes;
 
 }
+
+
 //////////////////////////////////////////////////******/////////////////////////////////////////
 void configure_audio()
 {
 	alt_up_av_config_dev* audio_config;
-	//alt_up_av_config_dev * config=alt_up_av_config_open_dev(ON_BOARD_AUDIO_ONLY_CONFIG);
-	//alt_up_av_config_open_dev(ON_BOARD_AUDIO_ONLY_CONFIG); //open the audio device.
 	audio_config = alt_up_av_config_open_dev(AUDIO_AND_VIDEO_CONFIG_0_NAME);
 
-	assert(audio_config);
 	alt_up_av_config_reset(audio_config);
 
 
@@ -206,7 +142,7 @@ void configure_audio()
 
 
 	// open the Audio port
-	audio_dev = alt_up_audio_open_dev("/dev/audio_0");
+	audio_dev = alt_up_audio_open_dev(AUDIO_0_NAME);
 	if (audio_dev == NULL)
 		alt_printf("Error: could not open audio device \n");
 	else
