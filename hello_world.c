@@ -1,31 +1,31 @@
-/*
- * "Hello World" example.
- *
- * This example prints 'Hello from Nios II' to the STDOUT stream. It runs on
- * the Nios II 'standard', 'full_featured', 'fast', and 'low_cost' example
- * designs. It runs with or without the MicroC/OS-II RTOS and requires a STDOUT
- * device in your system's hardware.
- * The memory footprint of this hosted application is ~69 kbytes by default
- * using the standard reference design.
- *
- * For a reduced footprint version of this template, and an explanation of how
- * to reduce the memory footprint for a given application, see the
- * "small_hello_world" template.
- *
- */
 
 #include <stdio.h>
 #include "altera_up_avalon_rs232.h"
 #include <string.h>
 #include "sound.h"
+#include "song_read.h"
 
 int main(){
 	configure_audio();
+	song_list=(char **)malloc(400*sizeof(char *));
+	int x;
+	for(x=0 ; x < 400; x++){
+		song_list[x]=(char*)malloc(20*sizeof(char));
+	}
 	unsigned int *sound = (unsigned int *)malloc(1000000*sizeof(unsigned int));
+	readSongsFromSDCard();
+	num_songs=i;
+	printf("%d\n",num_songs);
+	while(i>0){
+		printf("%s\n",song_list[i-1]);
+		i--;
+	}
 	sound = read_wav("laser_m.wav");
 	size = size_wav;
 	init_button_pio(sound);
 	alt_up_audio_enable_write_interrupt(audio_dev);
+
+
 }
 //int main() {
 //	printf("Hello from Nios II!\n");
