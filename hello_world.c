@@ -18,14 +18,37 @@
 #include "altera_up_avalon_rs232.h"
 #include <string.h>
 #include "sound.h"
+#include "Song.h"
+#include "lists.h"
 
 int main(){
-	configure_audio();
-	unsigned int *sound = (unsigned int *)malloc(1000000*sizeof(unsigned int));
-	sound = read_wav("laser_m.wav");
-	size = size_wav;
-	init_button_pio(sound);
-	alt_up_audio_enable_write_interrupt(audio_dev);
+	//configure_audio();
+	//unsigned int *sound = (unsigned int *)malloc(1000000*sizeof(unsigned int));
+	//sound = read_wav("laser_m.wav");
+	//size = size_wav;
+	//init_button_pio(sound);
+	//alt_up_audio_enable_write_interrupt(audio_dev);
+	listelement *test;
+	song song1;
+	song1.ID = 10;
+	strcpy(song1.name,"song1");
+	song song2;
+	song2.ID = 20;
+	strcpy(song2.name,"song2");
+	song song3;
+	song3.ID = 30;
+	strcpy(song3.name, "song3");
+	song song4;
+	song4.ID = 40;
+	strcpy(song4.name, "song4");
+	AddItem(test, song1);
+	AddItem(test,song2);
+	AddItem(test,song3);
+	AddItem(test,song4);
+
+	song a = getItemAt(test, 2);
+	printf("%d\n",a.ID);
+	printf("%s", a.name);
 }
 //int main() {
 //	printf("Hello from Nios II!\n");
