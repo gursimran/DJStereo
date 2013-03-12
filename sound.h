@@ -51,6 +51,14 @@ void play_wav(unsigned int * temp_array) {
 
 }
 
+void stop_sound(){
+	alt_up_audio_disable_write_interrupt(audio_dev);
+	k=0;
+}
+
+void pause_sound(){
+	alt_up_audio_disable_write_interrupt(audio_dev);
+}
 unsigned int * read_wav(char *name)
 {
 	unsigned char *levelBricksToDraw;
