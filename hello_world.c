@@ -1,18 +1,27 @@
+#include <stdlib.h>
+#include <system.h>
 
 #include <stdio.h>
 #include "altera_up_avalon_rs232.h"
 #include <string.h>
 #include "sound.h"
+#include "Song.h"
+#include "lists.h"
 #include "song_read.h"
 
+
 int main(){
+
+	//Initializing components that run sound
 	configure_audio();
+	//unsigned int *sound = (unsigned int *)malloc(1000000*sizeof(unsigned int));
+	songlist->link = NULL;
+	//Reading in the names of all songs from the SD card
 	song_list=(char **)malloc(400*sizeof(char *));
 	int x;
 	for(x=0 ; x < 400; x++){
 		song_list[x]=(char*)malloc(20*sizeof(char));
 	}
-	unsigned int *sound = (unsigned int *)malloc(1000000*sizeof(unsigned int));
 	readSongsFromSDCard();
 	num_songs=i;
 	printf("%d\n",num_songs);
@@ -20,12 +29,21 @@ int main(){
 		printf("%s\n",song_list[i-1]);
 		i--;
 	}
-	sound = read_wav("laser_m.wav");
-	size = size_wav;
-	init_button_pio(sound);
-	alt_up_audio_enable_write_interrupt(audio_dev);
 
+	printf("%d\n", songlist->dataitem.ID);
+	printf("%s", songlist->dataitem.name);
+	/*
+	for(x=0; x<num_songs; x++){
+		song a = getItemAt(songlist, x);
+		printf("%d\n",a.ID);
+		printf("%s", a.name);
+	}*/
 
+	//Playing a sound
+	//sound = read_wav("laser_m.wav");
+	//size = size_wav;
+	//init_button_pio(sound);
+	//alt_up_audio_enable_write_interrupt(audio_dev);
 }
 //int main() {
 //	printf("Hello from Nios II!\n");

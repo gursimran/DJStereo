@@ -6,6 +6,7 @@
 char **song_list;
 int i=1;
 int num_songs;
+listelement *songlist;
 
 int readSongsFromSDCard(){
 
@@ -37,10 +38,24 @@ int readSongsFromSDCard(){
 	else{
 		if(strstr(song_list[0],"WAV")==NULL)
 			i=0;
+		else{
+			song y;
+			y.ID=0;
+			strcpy(y.name, song_list[0]);
+			songlist = AddItem(songlist, y);
+			printf("%s", songlist->dataitem.name);
+		}
 
 		while(alt_up_sd_card_find_next(song_list[i])==0){
 			if(strstr(song_list[i],"WAV")!=NULL)
+			{
+
+				song x;
+				x.ID=i;
+				strcpy(x.name, song_list[i]);
+				songlist = AddItem(songlist, x);
 				i++;
+			}
 		}
 		if(strstr(song_list[i],"WAV")!=NULL)
 			i--;
