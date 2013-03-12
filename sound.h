@@ -59,6 +59,11 @@ void stop_sound(){
 void pause_sound(){
 	alt_up_audio_disable_write_interrupt(audio_dev);
 }
+
+void resume_sound(){
+	alt_up_audio_enable_write_interrupt(audio_dev);
+}
+
 unsigned int * read_wav(char *name)
 {
 	unsigned char *levelBricksToDraw;
