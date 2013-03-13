@@ -14,12 +14,14 @@
  *
  */
 
+#include "altera_up_sd_card_avalon_interface.h"
 #include <stdio.h>
 #include "altera_up_avalon_rs232.h"
 #include <string.h>
 #include "sound.h"
 #include "Song.h"
 #include "lists.h"
+
 
 int main(){
 	//configure_audio();
@@ -28,7 +30,7 @@ int main(){
 	//size = size_wav;
 	//init_button_pio(sound);
 	//alt_up_audio_enable_write_interrupt(audio_dev);
-	listelement *test;
+	listelement *test = NULL;
 	song song1;
 	song1.ID = 10;
 	strcpy(song1.name,"song1");
@@ -41,11 +43,11 @@ int main(){
 	song song4;
 	song4.ID = 40;
 	strcpy(song4.name, "song4");
-	AddItem(test, song1);
-	AddItem(test,song2);
-	AddItem(test,song3);
-	AddItem(test,song4);
-
+	test = AddItem(test, song1);
+	test = AddItem(test,song2);
+	test = AddItem(test,song3);
+	test = AddItem(test,song4);
+	song2.ID = 1000;
 	song a = getItemAt(test, 2);
 	printf("%d\n",a.ID);
 	printf("%s", a.name);

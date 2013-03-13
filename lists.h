@@ -4,16 +4,18 @@ typedef struct {
     struct listelement *link;
 }               listelement;
 
+
 //ADD, REMOVE, GET TO ITEM FUNCTIONS FOR QUEUES
 listelement * AddItem (listelement * listpointer, song data);
 listelement * RemoveItem (listelement * listpointer);
 song getItem (listelement * listpointer);
+int listItem = 1;
 
 //ADDITEM TO QUEUE
 listelement * AddItem (listelement * listpointer, song data) {
     listelement * lp = listpointer;
     //IF LIST IS NOT NULL THEN CREATE A NEW STRUCT THEN ADD THE ITEM AND POINT THE LISTPOINTER OF THE LAST ITEM BEFORE ADDING TO THE NEW STRUCT
-  //  if (listpointer != NULL) {
+    if (listpointer != NULL) {
         while (listpointer -> link != NULL)
             listpointer = listpointer -> link;
         listpointer -> link = (struct listelement  *) malloc (sizeof (listelement));
@@ -21,15 +23,16 @@ listelement * AddItem (listelement * listpointer, song data) {
         listpointer -> link = NULL;
         listpointer -> dataitem.ID = data.ID;
         strcpy(listpointer -> dataitem.name, data.name);
+        listItem++;
         return lp;
-    //}
+    }
     //IF LIST IS EMPTY CREATE A NEW STRUCT AND ADD THE ITEM
-   /* else {
+    else {
         listpointer = (struct listelement  *) malloc (sizeof (listelement));
         listpointer -> link = NULL;
         listpointer -> dataitem = data;
         return listpointer;
-    }*/
+    }
 }
 
 //REMOVE ITEM FROM QUEUE
