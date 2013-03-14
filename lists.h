@@ -15,6 +15,7 @@ int listItem = 1;
 listelement * AddItem (listelement * listpointer, song data) {
     listelement * lp = listpointer;
     //IF LIST IS NOT NULL THEN CREATE A NEW STRUCT THEN ADD THE ITEM AND POINT THE LISTPOINTER OF THE LAST ITEM BEFORE ADDING TO THE NEW STRUCT
+
     if (listpointer != NULL) {
         while (listpointer -> link != NULL)
             listpointer = listpointer -> link;
@@ -34,6 +35,7 @@ listelement * AddItem (listelement * listpointer, song data) {
         return listpointer;
     }
 }
+
 
 //REMOVE ITEM FROM QUEUE
 listelement * RemoveItem (listelement * listpointer) {
@@ -65,7 +67,6 @@ void PrintQueue (listelement * listpointer) {
 song getItemAt (listelement * listpointer, int location){
 	//printf("getting called\n");
 	int loc = location;
-
 	//printf("loc: %d\n",loc);
 	--loc;
 	//printf("\n %d test \n",location);
