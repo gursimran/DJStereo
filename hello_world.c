@@ -16,61 +16,28 @@ int main(){
 
 	//Initializing components that run sound
 	configure_audio();
-	//unsigned int *sound = (unsigned int *)malloc(1000000*sizeof(unsigned int));
-	songlist->link = NULL;
-	//Reading in the names of all songs from the SD card
-	song_list=(char **)malloc(400*sizeof(char *));
-	int x;
-	for(x=0 ; x < 400; x++){
-		song_list[x]=(char*)malloc(20*sizeof(char));
-	}
+	unsigned int *sound = (unsigned int *)malloc(1000000*sizeof(unsigned int));
+
+	//Initialize songList to null
+	songList = NULL;
+
+	//Read songs from SD card
 	readSongsFromSDCard();
-	num_songs=i;
 
-//	printf("%d\n",num_songs);
-//	while(i>0){
-//		printf("%s\n",song_list[i-1]);
-//		i--;
-//	}
-
-//	printf("%d\n", songlist->dataitem.ID);
-//	printf("%s", songlist->dataitem.name);
-
-
+	//print all song names
+	int x;
 	for(x=0; x<num_songs; x++){
-		song a = getItemAt(songlist, x);
+		song a = getItemAt(songList, x);
 		printf("%d\n",a.ID);
-		printf("%s", a.name);
+		printf("%s\n", a.name);
 
 	}
-
 	//Playing a sound
 	//sound = read_wav("laser_m.wav");
 	//size = size_wav;
 	//init_button_pio(sound);
 	//alt_up_audio_enable_write_interrupt(audio_dev);
 
-//	listelement *test = NULL;
-//	song song1;
-//	song1.ID = 10;
-//	strcpy(song1.name,"song1");
-//	song song2;
-//	song2.ID = 20;
-//	strcpy(song2.name,"song2");
-//	song song3;
-//	song3.ID = 30;
-//	strcpy(song3.name, "song3");
-//	song song4;
-//	song4.ID = 40;
-//	strcpy(song4.name, "song4");
-//	test = AddItem(test, song1);
-//	test = AddItem(test,song2);
-//	test = AddItem(test,song3);
-//	test = AddItem(test,song4);
-//	song2.ID = 1000;
-//	song a = getItemAt(test, 2);
-//	printf("%d\n",a.ID);
-//	printf("%s", a.name);
 
 }
 //int main() {

@@ -9,7 +9,7 @@ typedef struct {
 listelement * AddItem (listelement * listpointer, song data);
 listelement * RemoveItem (listelement * listpointer);
 song getItem (listelement * listpointer);
-int listItem = 1;
+int num_songs = 0;
 
 //ADDITEM TO QUEUE
 listelement * AddItem (listelement * listpointer, song data) {
@@ -17,23 +17,24 @@ listelement * AddItem (listelement * listpointer, song data) {
     //IF LIST IS NOT NULL THEN CREATE A NEW STRUCT THEN ADD THE ITEM AND POINT THE LISTPOINTER OF THE LAST ITEM BEFORE ADDING TO THE NEW STRUCT
 
     if (listpointer != NULL) {
-        while (listpointer -> link != NULL)
+    	while (listpointer -> link != NULL)
             listpointer = listpointer -> link;
-        printf("non empty list\n");
+
         listpointer -> link = (struct listelement  *) malloc (sizeof (listelement));
         listpointer = listpointer -> link;
         listpointer -> link = NULL;
         listpointer -> dataitem.ID = data.ID;
         strcpy(listpointer -> dataitem.name, data.name);
-        listItem++;
+        num_songs++;
         return lp;
     }
     //IF LIST IS EMPTY CREATE A NEW STRUCT AND ADD THE ITEM
     else {
-        printf("empty list\n");
     	listpointer = (struct listelement  *) malloc (sizeof (listelement));
         listpointer -> link = NULL;
-        listpointer -> dataitem = data;
+        listpointer -> dataitem.ID = data.ID;
+        strcpy(listpointer -> dataitem.name, data.name);
+        num_songs++;
         return listpointer;
     }
 }
@@ -59,7 +60,7 @@ void PrintQueue (listelement * listpointer) {
 	printf ("queue is empty!\n");
     else
 	while (listpointer != NULL) {
-	    printf ("%d\t", listpointer -> dataitem);
+	    printf ("%d\t %s\n", listpointer -> dataitem.ID, listpointer -> dataitem.name);
 	    listpointer = listpointer -> link;
 	}
     printf ("\n");

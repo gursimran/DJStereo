@@ -3,16 +3,15 @@
 #include <stdlib.h>
 #include <altera_up_sd_card_avalon_interface.h>
 
-char **song_list;
-int i=1;
-int num_songs;
-listelement *songlist;
+listelement *songList;
 
-int readSongsFromSDCard(){
-
+int readSongsFromSDCard() {
+	num_songs = 0;
+	char songFileName[20];
 	alt_up_sd_card_dev *device_reference = NULL;
 	device_reference = alt_up_sd_card_open_dev(
 			"/dev/Altera_UP_SD_Card_Avalon_Interface_0");
+
 	if (device_reference == NULL) {
 		printf("Could not read from the SDcard.\n");
 		return 0;
@@ -31,35 +30,24 @@ int readSongsFromSDCard(){
 		}
 	}
 
-	if(alt_up_sd_card_find_first(".", song_list[0]) != 0){
+	if (alt_up_sd_card_find_first(".", songFileName) != 0) {
 		printf("Could not find any files in the SD card");
 		return 0;
-	}
-	else{
-		if(strstr(song_list[0],"WAV")==NULL)
-			i=0;
-		else{
-			song y;
-			y.ID=0;
-			strcpy(y.name, song_list[0]);
-			songlist = AddItem(songlist, y);
-
-			//printf("%s", songlist->dataitem.name);
-
+	} else {
+		if (strstr(songFileName, "WAV") != NULL) {
+			song x;
+			x.ID = num_songs;
+			strcpy(x.name, songFileName);
+			songList = AddItem(songList, x);
 		}
-
-		while(alt_up_sd_card_find_next(song_list[i])==0){
-			if(strstr(song_list[i],"WAV")!=NULL)
-			{
-
+		while (alt_up_sd_card_find_next(songFileName) == 0) {
+			if (strstr(songFileName, "WAV") != NULL) {
 				song x;
-				x.ID=i;
-				strcpy(x.name, song_list[i]);
-				songlist = AddItem(songlist, x);
-				i++;
+				x.ID = num_songs;
+				strcpy(x.name, songFileName);
+				songList = AddItem(songList, x);
 			}
 		}
-		if(strstr(song_list[i],"WAV")!=NULL)
-			i--;
 	}
+
 }
