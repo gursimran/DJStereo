@@ -5,10 +5,10 @@
 #include <stdio.h>
 #include "altera_up_avalon_rs232.h"
 #include <string.h>
-#include "sound.h"
 #include "Song.h"
 #include "lists.h"
 #include "song_read.h"
+#include "sound.h"
 
 
 
@@ -16,7 +16,7 @@ int main(){
 
 	//Initializing components that run sound
 	configure_audio();
-	unsigned int *sound = (unsigned int *)malloc(1000000*sizeof(unsigned int));
+	sound = (unsigned int *)malloc(1000000*sizeof(unsigned int));
 
 	//Initialize songList to null
 	songList = NULL;
@@ -37,6 +37,13 @@ int main(){
 	//size = size_wav;
 	//init_button_pio(sound);
 	//alt_up_audio_enable_write_interrupt(audio_dev);
+	int p;
+		for(p=0; p < num_songs; p++){
+		song c = getItemAt(songList,p);
+		int length = getLengthOfSong(c.name);
+		printf("%d\n",length );
+	}
+	//play_song();
 
 
 }

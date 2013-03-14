@@ -25,11 +25,19 @@ int ding;
 int bricks;
 int laser;
 int paddle;
+unsigned int* sound;
 
 static void init_button_pio(unsigned int * temp_array)
 {
     alt_irq_register( AUDIO_0_IRQ, temp_array, play_wav );
     printf("4\n");
+}
+void play_song(){
+	song b = getItemAt(songList, a);
+	sound = read_wav(b.name);
+	size = size_wav;
+	init_button_pio(sound);
+	alt_up_audio_enable_write_interrupt(audio_dev);
 }
 
 
@@ -45,10 +53,7 @@ void play_wav(unsigned int * temp_array) {
 			k = 0;
 			//alt_up_audio_disable_write_interrupt(audio_dev);
 			alt_up_audio_reset_audio_core(audio_dev);
-			sound = read_wav(getItemAt(songList,a).name);
-			size = size_wav;
-			init_button_pio(sound);
-			alt_up_audio_enable_write_interrupt(audio_dev);
+			play_song();
 			a++;
 			//printf("\n");
 		} else
