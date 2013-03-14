@@ -43,7 +43,9 @@ int readSongsFromSDCard(){
 			y.ID=0;
 			strcpy(y.name, song_list[0]);
 			songlist = AddItem(songlist, y);
+
 			//printf("%s", songlist->dataitem.name);
+
 		}
 
 		while(alt_up_sd_card_find_next(song_list[i])==0){

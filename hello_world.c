@@ -26,6 +26,7 @@ int main(){
 	}
 	readSongsFromSDCard();
 	num_songs=i;
+
 //	printf("%d\n",num_songs);
 //	while(i>0){
 //		printf("%s\n",song_list[i-1]);
@@ -35,10 +36,12 @@ int main(){
 //	printf("%d\n", songlist->dataitem.ID);
 //	printf("%s", songlist->dataitem.name);
 
+
 	for(x=0; x<num_songs; x++){
 		song a = getItemAt(songlist, x);
 		printf("%d\n",a.ID);
 		printf("%s", a.name);
+
 	}
 
 	//Playing a sound
