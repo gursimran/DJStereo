@@ -12,6 +12,7 @@ int k = 0;
 alt_up_audio_dev * audio_dev=NULL;
 int a = 0;
 
+
 int number_bytes=0;
 int readWavFromSDCARD(char *name, unsigned char *levelBricksToDraw);
 void configure_audio();
@@ -26,6 +27,7 @@ int bricks;
 int laser;
 int paddle;
 unsigned int* sound;
+
 
 static void init_button_pio(unsigned int * temp_array)
 {
@@ -43,6 +45,7 @@ void play_song(){
 }
 
 
+
 void play_wav(unsigned int * temp_array) {
 
 
@@ -57,6 +60,7 @@ void play_wav(unsigned int * temp_array) {
 			alt_up_audio_reset_audio_core(audio_dev);
 			play_song();
 			a++;
+
 			//printf("\n");
 		} else
 			k += 100;

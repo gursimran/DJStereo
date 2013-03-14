@@ -41,6 +41,7 @@ int getLengthOfSong(char * name ){
 	return time;
 }
 
+
 int readSongsFromSDCard() {
 	num_songs = 0;
 	char songFileName[20];

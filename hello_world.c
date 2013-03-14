@@ -12,6 +12,7 @@
 
 
 
+
 int main(){
 
 	//Initializing components that run sound
@@ -40,7 +41,6 @@ int main(){
 	//init_button_pio(sound);
 	//alt_up_audio_enable_write_interrupt(audio_dev);
 	play_song();
-
 
 }
 //int main() {
