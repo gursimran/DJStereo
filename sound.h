@@ -33,11 +33,13 @@ static void init_button_pio(unsigned int * temp_array)
     printf("4\n");
 }
 void play_song(){
-	song b = getItemAt(songList, a);
-	sound = read_wav(b.name);
-	size = size_wav;
-	init_button_pio(sound);
-	alt_up_audio_enable_write_interrupt(audio_dev);
+	if (a<num_songs){
+		song b = getItemAt(songList, a);
+		sound = read_wav(b.name);
+		size = size_wav;
+		init_button_pio(sound);
+		alt_up_audio_enable_write_interrupt(audio_dev);
+	}
 }
 
 

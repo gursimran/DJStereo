@@ -25,6 +25,7 @@ listelement * AddItem (listelement * listpointer, song data) {
         listpointer -> link = NULL;
         listpointer -> dataitem.ID = data.ID;
         strcpy(listpointer -> dataitem.name, data.name);
+        listpointer -> dataitem.LENGTH = data.LENGTH;
         num_songs++;
         return lp;
     }
@@ -34,6 +35,7 @@ listelement * AddItem (listelement * listpointer, song data) {
         listpointer -> link = NULL;
         listpointer -> dataitem.ID = data.ID;
         strcpy(listpointer -> dataitem.name, data.name);
+        listpointer -> dataitem.LENGTH = data.LENGTH;
         num_songs++;
         return listpointer;
     }

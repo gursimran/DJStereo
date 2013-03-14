@@ -30,6 +30,8 @@ int main(){
 		song a = getItemAt(songList, x);
 		printf("%d\n",a.ID);
 		printf("%s\n", a.name);
+		printf("%d\n", a.LENGTH);
+
 
 	}
 	//Playing a sound
@@ -37,13 +39,7 @@ int main(){
 	//size = size_wav;
 	//init_button_pio(sound);
 	//alt_up_audio_enable_write_interrupt(audio_dev);
-	int p;
-		for(p=0; p < num_songs; p++){
-		song c = getItemAt(songList,p);
-		int length = getLengthOfSong(c.name);
-		printf("%d\n",length );
-	}
-	//play_song();
+	play_song();
 
 
 }

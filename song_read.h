@@ -6,28 +6,8 @@
 listelement *songList;
 unsigned char * data;
 
-int getLengthOfSong(char * name){
+int getLengthOfSong(char * name ){
 
-	alt_up_sd_card_dev *device_reference = NULL;
-	device_reference = alt_up_sd_card_open_dev(
-			"/dev/Altera_UP_SD_Card_Avalon_Interface_0");
-	if (device_reference == NULL) {
-		printf("Could not read from the SDcard.\n");
-		return 0;
-	} else {
-		if (!alt_up_sd_card_is_Present()) {
-			printf("The SDcard is not present!\n");
-			return 0;
-		}
-
-		else {
-			if (!alt_up_sd_card_is_FAT16()) {
-				printf(
-						"The SDcard is not formatted to be FAT16 and could not be read.\n");
-				return 0;
-			}
-		}
-	}
 	int fileHandle;
 	short dataRead;
 	// Get file handle
@@ -41,17 +21,20 @@ int getLengthOfSong(char * name){
 		dataRead = alt_up_sd_card_read(fileHandle);
 		//dataRead=dataRead & '0000000011111111';
 		data[n] = dataRead;
-		printf("%d ",dataRead);
+		//Print the bytes that are read
+		//printf("%x ",data[n]);
 		n++;
 	}
-	printf("\n");
 
-	unsigned int total_size = (data[6] << 24 )| (data[7]<<16) | (data[5]<<8) | data[4];
-	int byte_rate = (data[30]<<24) | (data[31]<<16) | (data[29]<<8) | data[28];
+	unsigned int total_size = (data[7] << 24) | (data[6] << 16) | (data[5] << 8) | data[4];
+	int byte_rate = (data[31] << 24) | (data[30] << 16) | (data[29] << 8) | data[28];
 	total_size +=8;
-	printf("%d\n", total_size);
-	printf("%d\n", byte_rate);
-	int time = (total_size/byte_rate);
+
+	//Printing the size of the file in bytes as well as the byte rate
+	//printf("%d\n", total_size);
+	//printf("%d\n", byte_rate);
+
+	int time = (total_size * 1000.0)/byte_rate;
 
 	//Close file
 	alt_up_sd_card_fclose(fileHandle);
@@ -90,6 +73,7 @@ int readSongsFromSDCard() {
 		if (strstr(songFileName, "WAV") != NULL) {
 			song x;
 			x.ID = num_songs;
+			x.LENGTH = getLengthOfSong(songFileName);
 			strcpy(x.name, songFileName);
 			songList = AddItem(songList, x);
 		}
@@ -97,10 +81,10 @@ int readSongsFromSDCard() {
 			if (strstr(songFileName, "WAV") != NULL) {
 				song x;
 				x.ID = num_songs;
+				x.LENGTH=getLengthOfSong(songFileName);
 				strcpy(x.name, songFileName);
 				songList = AddItem(songList, x);
 			}
 		}
 	}
-
 }
