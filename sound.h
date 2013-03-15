@@ -10,6 +10,8 @@
 
 int k = 0;
 alt_up_audio_dev * audio_dev=NULL;
+int a = 0;
+
 
 int number_bytes=0;
 int readWavFromSDCARD(char *name, unsigned char *levelBricksToDraw);
@@ -20,6 +22,8 @@ void reset_variables();
 int size=0;
 int size_wav=0;
 unsigned int * temp_array_play=NULL;
+unsigned int* sound;
+
 
 
 static void init_button_pio(unsigned int * temp_array)
@@ -27,6 +31,16 @@ static void init_button_pio(unsigned int * temp_array)
     alt_irq_register( AUDIO_0_IRQ, temp_array, play_wav );
     printf("4\n");
 }
+void play_song(){
+	if (a<num_songs){
+		song b = getItemAt(songList, a);
+		sound = read_wav(b.name);
+		size = size_wav;
+		init_button_pio(sound);
+		alt_up_audio_enable_write_interrupt(audio_dev);
+	}
+}
+
 
 
 void play_wav(unsigned int * temp_array) {
@@ -41,6 +55,9 @@ void play_wav(unsigned int * temp_array) {
 			k = 0;
 			//alt_up_audio_disable_write_interrupt(audio_dev);
 			alt_up_audio_reset_audio_core(audio_dev);
+			play_song();
+			a++;
+
 			//printf("\n");
 		} else
 			k += 100;

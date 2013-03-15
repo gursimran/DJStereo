@@ -5,18 +5,19 @@
 #include <stdio.h>
 #include "altera_up_avalon_rs232.h"
 #include <string.h>
-#include "sound.h"
 #include "Song.h"
 #include "lists.h"
 #include "song_read.h"
 #include "Timer.h"
+#include "sound.h"
+
 
 
 int main(){
 
 	//Initializing components that run sound
 	configure_audio();
-	unsigned int *sound = (unsigned int *)malloc(1000000*sizeof(unsigned int));
+	sound = (unsigned int *)malloc(1000000*sizeof(unsigned int));
 
 	//Initialize songList to null
 	songList = NULL;
@@ -30,18 +31,23 @@ int main(){
 		song a = getItemAt(songList, x);
 		printf("%d\n",a.ID);
 		printf("%s\n", a.name);
-
+		printf("%d\n", a.LENGTH);
 	}
 
 	//init timer
 	init_Timer();
 
+
+	songString = (char*)malloc (num_songs * (sizeof(song)+(sizeof(char)*3)));
+	song_string(songList);
+	printf("%s\n", songString);
+
 	//Playing a sound
-	//sound = read_wav("laser_m.wav");
+	//sound = read_wav(getItemAt(songList,x).name);
 	//size = size_wav;
 	//init_button_pio(sound);
 	//alt_up_audio_enable_write_interrupt(audio_dev);
-
+	play_song();
 
 }
 //int main() {

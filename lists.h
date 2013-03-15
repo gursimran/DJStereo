@@ -10,6 +10,7 @@ listelement * AddItem (listelement * listpointer, song data);
 listelement * RemoveItem (listelement * listpointer);
 song getItem (listelement * listpointer);
 int num_songs = 0;
+char * songString;
 
 //ADDITEM TO QUEUE
 listelement * AddItem (listelement * listpointer, song data) {
@@ -25,6 +26,7 @@ listelement * AddItem (listelement * listpointer, song data) {
         listpointer -> link = NULL;
         listpointer -> dataitem.ID = data.ID;
         strcpy(listpointer -> dataitem.name, data.name);
+        listpointer -> dataitem.LENGTH = data.LENGTH;
         num_songs++;
         return lp;
     }
@@ -34,6 +36,7 @@ listelement * AddItem (listelement * listpointer, song data) {
         listpointer -> link = NULL;
         listpointer -> dataitem.ID = data.ID;
         strcpy(listpointer -> dataitem.name, data.name);
+        listpointer -> dataitem.LENGTH = data.LENGTH;
         num_songs++;
         return listpointer;
     }
@@ -81,4 +84,40 @@ song getItemAt (listelement * listpointer, int location){
 		}
 	}
 	return listpointer -> dataitem;
+}
+
+void song_string(listelement * listpointer){
+	int l;
+	char k[20];
+	strcpy(songString, "");
+	for(l=0; l<num_songs; l++){
+		song m = getItemAt(listpointer, l);
+		strcat(songString, m.name);
+		strcat(songString, ",");
+
+		sprintf(k, "%d", m.LENGTH);
+
+		strcat(songString, k);
+		strcat(songString, ",");
+
+		sprintf(k, "%d", m.ID);
+
+		strcat(songString, k);
+		strcat(songString, "|");
+
+		if(l== (num_songs-1)){
+			strcat(songString, m.name);
+			strcat(songString, ",");
+
+			sprintf(k, "%d", m.LENGTH);
+
+			strcat(songString, k);
+			strcat(songString, ",");
+
+			sprintf(k, "%d", m.ID);
+
+			strcat(songString, k);
+			strcat(songString, "\0");
+		}
+	}
 }
