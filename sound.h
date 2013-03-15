@@ -20,10 +20,7 @@ void reset_variables();
 int size=0;
 int size_wav=0;
 unsigned int * temp_array_play=NULL;
-int ding;
-int bricks;
-int laser;
-int paddle;
+
 
 static void init_button_pio(unsigned int * temp_array)
 {

@@ -9,7 +9,7 @@
 #include "Song.h"
 #include "lists.h"
 #include "song_read.h"
-
+#include "Timer.h"
 
 
 int main(){
@@ -32,6 +32,10 @@ int main(){
 		printf("%s\n", a.name);
 
 	}
+
+	//init timer
+	init_Timer();
+
 	//Playing a sound
 	//sound = read_wav("laser_m.wav");
 	//size = size_wav;
