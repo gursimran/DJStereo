@@ -32,9 +32,10 @@ int main(){
 		printf("%d\n",a.ID);
 		printf("%s\n", a.name);
 		printf("%d\n", a.LENGTH);
-
-
 	}
+	songString = (char*)malloc (num_songs * (sizeof(song)+(sizeof(char)*3)));
+	song_string(songList);
+	printf("%s\n", songString);
 	//Playing a sound
 	//sound = read_wav(getItemAt(songList,x).name);
 	//size = size_wav;
