@@ -13,16 +13,14 @@ alt_up_audio_dev * audio_dev=NULL;
 int a = 0;
 
 
-int number_bytes=0;
-int readWavFromSDCARD(char *name, unsigned char *levelBricksToDraw);
+
+void readWavFromSDCARD(char *name, unsigned char *levelBricksToDraw);
 void configure_audio();
-unsigned int * read_wav(char *name);
+unsigned int * read_wav(char *name, unsigned int size);
 void play_wav();
-void reset_variables();
+
 int size=0;
-int size_wav=0;
-unsigned int * temp_array_play=NULL;
-unsigned int* sound;
+
 
 
 
@@ -31,11 +29,13 @@ static void init_button_pio(unsigned int * temp_array)
     alt_irq_register( AUDIO_0_IRQ, temp_array, play_wav );
     printf("4\n");
 }
-void play_song(){
+void play_song(int song_to_play){
+	a = song_to_play % num_songs;
 	if (a<num_songs){
 		song b = getItemAt(songList, a);
-		sound = read_wav(b.name);
-		size = size_wav;
+		unsigned int* sound;
+		sound = read_wav(b.name, b.Size);
+		size = b.Size;
 		init_button_pio(sound);
 		alt_up_audio_enable_write_interrupt(audio_dev);
 	}
@@ -53,10 +53,11 @@ void play_wav(unsigned int * temp_array) {
 
 		if (k >= size) {
 			k = 0;
-			//alt_up_audio_disable_write_interrupt(audio_dev);
+			alt_up_audio_disable_write_interrupt(audio_dev);
 			alt_up_audio_reset_audio_core(audio_dev);
-			play_song();
 			a++;
+			free(temp_array);
+			play_song(a);
 
 			//printf("\n");
 		} else
@@ -78,80 +79,80 @@ void resume_sound(){
 	alt_up_audio_enable_write_interrupt(audio_dev);
 }
 
-unsigned int * read_wav(char *name)
+void next_sound(){
+	++a;
+	play_song(a);
+}
+
+void previous_sound(){
+	--a;
+	play_song(a);
+}
+unsigned int * read_wav(char *name, unsigned int size)
 {
 	unsigned char *levelBricksToDraw;
-	levelBricksToDraw = (unsigned char *) malloc(100000 * sizeof(unsigned char));
+	levelBricksToDraw = (unsigned char *) malloc(size * sizeof(unsigned char));
 
-	int fileopen;
-	fileopen = readWavFromSDCARD(name, levelBricksToDraw);
+	readWavFromSDCARD(name, levelBricksToDraw);
 
 	unsigned int * temp_array;
-	temp_array = (unsigned int *) malloc((fileopen / 2) * sizeof(unsigned int));
+	temp_array = (unsigned int *) malloc((size / 2) * sizeof(unsigned int));
 	int x;
 	int y = 0;
-	for (x = 0; x < number_bytes; x += 2) {
+	for (x = 0; x < size; x += 2) {
 		unsigned int sample = (levelBricksToDraw[x + 1] << 8 | levelBricksToDraw[x]) << 8; //original
 		temp_array[y] = sample;
 		y++;
 	}
-	size_wav=y;
+	free(levelBricksToDraw);
 	return temp_array;
 }
 
 /////////////////////////////////////////*******?//////////////////////////////////////////////
-int readWavFromSDCARD(char * name, unsigned char *levelBricksToDraw) {
+void readWavFromSDCARD(char * name, unsigned char *levelBricksToDraw) {
 	// Create row an column variables for iteration
-	int row, column, i, j = 0;
-
+	int j=0;
 	// Variables needed for sdcard reading
 	int fileHandle;
 	 short dataRead;
 	//int number_bytes = 0;
 
 	// File name to be opened
-	char *fileName = (int *) malloc(12 * sizeof(int));
 
 	alt_up_sd_card_dev *device_reference = NULL;
 	device_reference = alt_up_sd_card_open_dev(
 			"/dev/Altera_UP_SD_Card_Avalon_Interface_0");
 	if (device_reference == NULL) {
 		printf("Could not read from the SDcard.\n");
-		return 0;
 	} else {
 		if (!alt_up_sd_card_is_Present()) {
 			printf("The SDcard is not present!\n");
-			return 0;
 		}
 
 		else {
 			if (!alt_up_sd_card_is_FAT16()) {
 				printf(
 						"The SDcard is not formatted to be FAT16 and could not be read.\n");
-				return 0;
+			}
+			else{
+				fileHandle = alt_up_sd_card_fopen(name, false);
+
+					// Get first byte of file
+					dataRead = alt_up_sd_card_read(fileHandle);
+
+					// Keep reading till eof
+					while (dataRead > -1) {
+						levelBricksToDraw[j] = dataRead;
+						j++;
+						dataRead = alt_up_sd_card_read(fileHandle);
+					}
+
+					printf("number of reads: %d\n", j);
+
+					alt_up_sd_card_fclose(fileHandle);
 			}
 		}
 	}
-
-
-	fileHandle = alt_up_sd_card_fopen(name, false);
-
-	// Get first byte of file
-	dataRead = alt_up_sd_card_read(fileHandle);
-
-	// Keep reading till eof
-	while (dataRead > -1) {
-		number_bytes++;
-		levelBricksToDraw[j] = dataRead;
-		j++;
-		dataRead = alt_up_sd_card_read(fileHandle);
-	}
-
-	printf("number of reads: %d\n", number_bytes);
-
-	alt_up_sd_card_fclose(fileHandle);
-	return number_bytes;
-
 }
 
 
@@ -171,9 +172,9 @@ void configure_audio()
 	// open the Audio port
 	audio_dev = alt_up_audio_open_dev(AUDIO_0_NAME);
 	if (audio_dev == NULL)
-		alt_printf("Error: could not open audio device \n");
+		printf("Error: could not open audio device \n");
 	else
-		alt_printf("Opened audio device \n");
+		printf("Opened audio device \n");
 
 	alt_up_audio_reset_audio_core(audio_dev);
 }

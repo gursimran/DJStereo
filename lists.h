@@ -89,35 +89,32 @@ song getItemAt (listelement * listpointer, int location){
 void song_string(listelement * listpointer){
 	int l;
 	char k[20];
-	strcpy(songString, "");
+	songString = (char*)malloc (num_songs * (sizeof(song)+(sizeof(char)*3)));
+	//strcpy(songString, "");
 	for(l=0; l<num_songs; l++){
 		song m = getItemAt(listpointer, l);
-		strcat(songString, m.name);
-		strcat(songString, ",");
+		if (l == 0){
+			strcpy(songString, m.name);
+		}
+		else{
+			strcat(songString, m.name);
+		}
+		strcat(songString, ":");
 
 		sprintf(k, "%d", m.LENGTH);
 
 		strcat(songString, k);
-		strcat(songString, ",");
+		strcat(songString, ":");
 
 		sprintf(k, "%d", m.ID);
 
 		strcat(songString, k);
-		strcat(songString, "|");
 
 		if(l== (num_songs-1)){
-			strcat(songString, m.name);
-			strcat(songString, ",");
-
-			sprintf(k, "%d", m.LENGTH);
-
-			strcat(songString, k);
-			strcat(songString, ",");
-
-			sprintf(k, "%d", m.ID);
-
-			strcat(songString, k);
 			strcat(songString, "\0");
+		}
+		else {
+			strcat(songString, "|");
 		}
 	}
 }

@@ -8,8 +8,9 @@
 #include "Song.h"
 #include "lists.h"
 #include "song_read.h"
-#include "Timer.h"
 #include "sound.h"
+#include "Timer.h"
+
 
 
 
@@ -17,7 +18,7 @@ int main(){
 
 	//Initializing components that run sound
 	configure_audio();
-	sound = (unsigned int *)malloc(1000000*sizeof(unsigned int));
+	//sound = (unsigned int *)malloc(1000000*sizeof(unsigned int));
 
 	//Initialize songList to null
 	songList = NULL;
@@ -32,13 +33,14 @@ int main(){
 		printf("%d\n",a.ID);
 		printf("%s\n", a.name);
 		printf("%d\n", a.LENGTH);
+		printf("%d\n", a.Size);
 	}
 
 	//init timer
 	init_Timer();
 
 
-	songString = (char*)malloc (num_songs * (sizeof(song)+(sizeof(char)*3)));
+
 	song_string(songList);
 	printf("%s\n", songString);
 
@@ -47,7 +49,9 @@ int main(){
 	//size = size_wav;
 	//init_button_pio(sound);
 	//alt_up_audio_enable_write_interrupt(audio_dev);
-	play_song();
+	//play_song();
+
+	while(1);
 
 }
 //int main() {

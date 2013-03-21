@@ -6,38 +6,44 @@
 listelement *songList;
 unsigned char * data;
 
-int getLengthOfSong(char * name ){
 
+unsigned int getSizeOfSong(char * name){
 	int fileHandle;
-	short dataRead;
-	// Get file handle
-	fileHandle = alt_up_sd_card_fopen(name, false);
-	int n = 0;
-	data = (unsigned char *) malloc (32 * sizeof (unsigned char));
-	// Get first 8 bytes of file
-	while (n < 32){
-		// If new line character then write data to next line
-		// and (increment column)
-		dataRead = alt_up_sd_card_read(fileHandle);
-		//dataRead=dataRead & '0000000011111111';
-		data[n] = dataRead;
-		//Print the bytes that are read
-		//printf("%x ",data[n]);
-		n++;
-	}
+		short dataRead;
+		// Get file handle
+		fileHandle = alt_up_sd_card_fopen(name, false);
+		int n = 0;
+		data = (unsigned char *) malloc (32 * sizeof (unsigned char));
+		// Get first 8 bytes of file
+		while (n < 32){
+			// If new line character then write data to next line
+			// and (increment column)
+			dataRead = alt_up_sd_card_read(fileHandle);
+			//dataRead=dataRead & '0000000011111111';
+			data[n] = dataRead;
+			//Print the bytes that are read
+			//printf("%x ",data[n]);
+			n++;
+		}
 
-	unsigned int total_size = (data[7] << 24) | (data[6] << 16) | (data[5] << 8) | data[4];
-	int byte_rate = (data[31] << 24) | (data[30] << 16) | (data[29] << 8) | data[28];
-	total_size +=8;
+		unsigned int total_size = (data[7] << 24) | (data[6] << 16) | (data[5] << 8) | data[4];
+
+		total_size +=8;
+		alt_up_sd_card_fclose(fileHandle);
+		free(data);
+		return total_size;
+}
+int getLengthOfSong(unsigned int total_size ){
+
 
 	//Printing the size of the file in bytes as well as the byte rate
 	//printf("%d\n", total_size);
 	//printf("%d\n", byte_rate);
-
+	int byte_rate = (data[31] << 24) | (data[30] << 16) | (data[29] << 8) | data[28];
 	int time = (total_size * 1000.0)/byte_rate;
 
 	//Close file
-	alt_up_sd_card_fclose(fileHandle);
+
 	return time;
 }
 
@@ -74,7 +80,8 @@ int readSongsFromSDCard() {
 		if (strstr(songFileName, "WAV") != NULL) {
 			song x;
 			x.ID = num_songs;
-			x.LENGTH = getLengthOfSong(songFileName);
+			x.Size = getSizeOfSong(songFileName);
+			x.LENGTH = getLengthOfSong(x.Size);
 			strcpy(x.name, songFileName);
 			songList = AddItem(songList, x);
 		}
@@ -82,7 +89,8 @@ int readSongsFromSDCard() {
 			if (strstr(songFileName, "WAV") != NULL) {
 				song x;
 				x.ID = num_songs;
-				x.LENGTH=getLengthOfSong(songFileName);
+				x.Size = getSizeOfSong(songFileName);
+				x.LENGTH=getLengthOfSong(x.Size);
 				strcpy(x.name, songFileName);
 				songList = AddItem(songList, x);
 			}
