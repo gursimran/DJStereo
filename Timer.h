@@ -17,7 +17,7 @@ void sendData(char * message){
 
 
 void ReadData(){
-
+	printf("interrupt\n");
 	unsigned char data;
 	unsigned char parity;
 	alt_up_rs232_dev* uart = alt_up_rs232_open_dev(RS232_0_NAME);
