@@ -7,7 +7,7 @@ listelement *songList;
 unsigned char * data;
 
 
-unsigned int getSizeOfSong(char * name){
+int getSizeOfSong(char * name){
 	int fileHandle;
 		short dataRead;
 		// Get file handle
@@ -26,24 +26,26 @@ unsigned int getSizeOfSong(char * name){
 			n++;
 		}
 
-		unsigned int total_size = (data[7] << 24) | (data[6] << 16) | (data[5] << 8) | data[4];
+		int total_size = (data[7] << 24) | (data[6] << 16) | (data[5] << 8) | data[4];
+		//printf("%d ", total_size);
 
 		total_size +=8;
 		alt_up_sd_card_fclose(fileHandle);
-		free(data);
+
 		return total_size;
 }
-int getLengthOfSong(unsigned int total_size ){
+int getLengthOfSong(int total_size ){
 
 
 	//Printing the size of the file in bytes as well as the byte rate
 	//printf("%d\n", total_size);
-	//printf("%d\n", byte_rate);
+	//
 	int byte_rate = (data[31] << 24) | (data[30] << 16) | (data[29] << 8) | data[28];
+	//printf("%d\n", byte_rate);
 	int time = (total_size * 1000.0)/byte_rate;
 
 	//Close file
-
+	free(data);
 	return time;
 }
 

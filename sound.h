@@ -18,31 +18,34 @@ void readWavFromSDCARD(char *name, unsigned char *levelBricksToDraw);
 void configure_audio();
 unsigned int * read_wav(char *name, unsigned int size);
 void play_wav();
+void read_wav_buffer (char *name, int size);
 
 int size=0;
 
 
 
 
-static void init_button_pio()
+static void init_button_pio(unsigned int * soundBuffer )
 {
-    alt_irq_register( AUDIO_0_IRQ,NULL, play_wav );
-    printf("4\n");
+    alt_irq_register( AUDIO_0_IRQ,soundBuffer, play_wav );
 }
+
 void play_song(int song_to_play){
 	a = song_to_play % num_songs;
 	if (a<num_songs){
 		song b = getItemAt(songList, a);
+		size = b.Size/2;
+		init_button_pio(soundBuffer);
+		//unsigned char * sound;
 		read_wav_buffer(b.name, b.Size);
-		size = b.Size;
-		init_button_pio();
 		alt_up_audio_enable_write_interrupt(audio_dev);
+		//alt_up_audio_enable_write_interrupt(audio_dev);
 	}
 }
 
 
 
-void play_wav() {
+void play_wav(unsigned int * soundBuffer) {
 
 
 		alt_up_audio_write_fifo(audio_dev, &(soundBuffer[k]), 100,
@@ -50,22 +53,28 @@ void play_wav() {
 		alt_up_audio_write_fifo(audio_dev, &(soundBuffer[k]), 100,
 				ALT_UP_AUDIO_LEFT);
 
-		if ((noTimes*100000)+k >= size) {
+		if (k >= size) {
 			k = 0;
 			noTimes=0;
 			alt_up_audio_disable_write_interrupt(audio_dev);
 			alt_up_audio_reset_audio_core(audio_dev);
 			a++;
 			free(soundBuffer);
-			play_song(a);
+			playSong = 1;
+			//play_song(a);
 
 			//printf("\n");
 		} else{
-			k += 100;
-			if (k == 100000){
-				k = 0;
-				noTimes++;
+			int x;
+			alt_up_audio_disable_write_interrupt(audio_dev);
+			for (x=0; x< 10; x++){
+				printf("%x ", (soundBuffer[x] >> 16));
 			}
+			k += 100;
+			//if (k == 100000){
+			//	k = 0;
+			//	noTimes++;
+			//}
 		}
 			//printf("%d",k);
 
@@ -94,7 +103,7 @@ void previous_sound(){
 	play_song(a);
 }
 
-void read_wav_buffer (char *name, unsigned int size){
+void read_wav_buffer (char *name, int size){
 	alt_up_sd_card_dev *device_reference = NULL;
 	device_reference = alt_up_sd_card_open_dev(
 			"/dev/Altera_UP_SD_Card_Avalon_Interface_0");
@@ -112,9 +121,13 @@ void read_wav_buffer (char *name, unsigned int size){
 			} else {
 				int fileHandle;
 				short dataRead;
-				soundBuffer = (unsigned int *)malloc(sizeof(unsigned int)*100000);
+				soundBuffer = (unsigned int *)malloc(sizeof(unsigned int)*500000);
+				int i;
+				for (i=0;i<500000;i++){
+					soundBuffer[i] = 0;
+				}
 				unsigned char * temp_array;
-				temp_array = (unsigned char *)malloc(200000*sizeof(unsigned char));
+				temp_array = (unsigned char *)malloc(1000000*sizeof(unsigned char));
 				fileHandle = alt_up_sd_card_fopen(name, false);
 				int j=0;
 				int y=0;
@@ -127,16 +140,19 @@ void read_wav_buffer (char *name, unsigned int size){
 					temp_array[j] = dataRead;
 					j++;
 					dataRead = alt_up_sd_card_read(fileHandle);
-					while(k<y);
-					soundBuffer[y] = (temp_array[j] << 8 | temp_array[j-1]) << 8;
+					//while(k<y && noTimes>0);
+					unsigned int sample = (temp_array[j] << 8 | temp_array[j-1]) << 8;
+					soundBuffer[y] = sample;
 					y++;
-					if (y == 100000){
-						alt_up_audio_enable_write_interrupt(audio_dev);
-						y=0;
-						j=0;
-					}
+//					if (y == size/2){
+//						alt_up_audio_enable_write_interrupt(audio_dev);
+//						y=0;
+//						j=0;
+//					}
 				}
+				printf ("number of reads: %d\n", j);
 				alt_up_sd_card_fclose(fileHandle);
+				free(temp_array);
 			}
 		}
 	}

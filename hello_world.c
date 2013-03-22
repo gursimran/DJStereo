@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <system.h>
-
+char playSong = 0;
 #include "altera_up_sd_card_avalon_interface.h"
 #include <stdio.h>
 #include "altera_up_avalon_rs232.h"
@@ -51,7 +51,12 @@ int main(){
 	//alt_up_audio_enable_write_interrupt(audio_dev);
 	//play_song();
 
-	while(1);
+	while(1){
+		if (playSong == 1){
+			play_song(a);
+			playSong = 0;
+		}
+	}
 
 }
 //int main() {
