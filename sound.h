@@ -8,6 +8,7 @@
 #include "assert.h"
 #include "sys/alt_irq.h"
 
+
 char playing = 0;
 char started = 0;
 int k = 0;
@@ -24,6 +25,7 @@ unsigned int * read_wav(char *name, unsigned int size);
 void play_wav();
 void read_wav_buffer (char *name, int size);
 int volume = 0;
+int buffer_size = 10000;
 
 int size=0;
 
@@ -46,6 +48,7 @@ void play_song(int song_to_play){
 		//unsigned char * sound;
 		usleep(1000000);
 		started = 0;
+		y=0;
 		printf("calling method now to read file for song: %d\n",a);
 		read_wav_buffer(b.name, b.Size);
 		printf("returned from method, no of times: %d\n", noTimes);
@@ -65,7 +68,7 @@ void play_wav() {
 				ALT_UP_AUDIO_RIGHT);
 		alt_up_audio_write_fifo(audio_dev, &(soundBuffer[k]), 100,
 				ALT_UP_AUDIO_LEFT);
-		if ((190000*noTimes) + 100 + k >= size) {
+		if ((buffer_size*noTimes) + 100 + k >= size) {
 			k = 0;
 			noTimes=0;
 			//playSong = 1;
@@ -78,8 +81,7 @@ void play_wav() {
 			free(soundBuffer);
 		} else{
 			k += 100;
-
-			if (k == 190000){
+			if (k == buffer_size){
 				k = 0;
 				noTimes++;
 			}
@@ -146,35 +148,27 @@ void read_wav_buffer (char *name, int size){
 						"The SDcard is not formatted to be FAT16 and could not be read.\n");
 			} else {
 				int fileHandle;
-				int fileHandle2;
 				short dataRead;
-				short dataRead2;
-				soundBuffer = (unsigned int *)malloc(sizeof(unsigned int)*190000);
+				soundBuffer = (unsigned int *)malloc(sizeof(unsigned int)*buffer_size);
 				int i;
-				for (i=0;i<190000;i++){
+				for (i=0;i<buffer_size;i++){
 					soundBuffer[i] = 0;
 				}
-				song x = getItemAt(songList, a+1);
-				fileHandle2 = alt_up_sd_card_fopen(x.name, false);
+				//song x = getItemAt(songList, a+1);
+				//fileHandle2 = alt_up_sd_card_fopen(x.name, false);
 				fileHandle = alt_up_sd_card_fopen(name, false);
-				printf("filehandle: %d, filehandle2: %d", fileHandle, fileHandle2);
+				//printf("filehandle: %d, filehandle2: %d", fileHandle, fileHandle2);
 				int j=0;
 
 				stop_currently_playing = 0;
-				int whenToStart = 190000;
-				if (size/2 < 190000){
+				int whenToStart = buffer_size;
+				if (size/2 < buffer_size){
 					whenToStart = size/2;
 				}
-				int setVolume;
 				unsigned int temp;
 				unsigned int temp2;
-				unsigned int temp3;
-				unsigned int temp4;
-				int z= 0;
 				// Get first byte of file
-				dataRead2 = alt_up_sd_card_read(fileHandle2);
 				dataRead = alt_up_sd_card_read(fileHandle);
-				//while(y <= 190000)
 				while (dataRead > -1){
 					if (stop_currently_playing == 1){
 						break;
@@ -182,7 +176,7 @@ void read_wav_buffer (char *name, int size){
 					if (started == 1){
 						int x = 0;
 						while (pause == 1);
-						while(abs(y-k)<1000){
+						while(abs(y-k)<2){
 							x++;
 							if (x == 10000000){
 
@@ -193,32 +187,16 @@ void read_wav_buffer (char *name, int size){
 							}
 						}
 					}
-					while (z < 1000){
 					temp = dataRead ;
-					//temp3 = dataRead2;
 					dataRead = alt_up_sd_card_read(fileHandle);
-					//dataRead2 = alt_up_sd_card_read(fileHandle2);
 					temp2 = dataRead ;
-					//temp4 = dataRead2;
 					dataRead = alt_up_sd_card_read(fileHandle);
-					//dataRead2 = alt_up_sd_card_read(fileHandle2);
-					soundBuffer[y] = ((temp2 << 8 | temp) << 8);// + ((temp4 << 8 | temp3) << 8);
+					soundBuffer[y] = ((temp2 << 8 | temp) << 8);
 					if(volume > 0){
 						soundBuffer[y] = soundBuffer[y]/2;
 					}
 					y++;
-					z++;
-				}
-				z = 0;
-				while(z <= 1000){
-					temp3 = dataRead2;
-					dataRead2 = alt_up_sd_card_read(fileHandle2);
-					temp4 = dataRead2;
-					dataRead2 = alt_up_sd_card_read(fileHandle2);
-					//y++;
-					z++;
-					soundBuffer[y-z] = soundBuffer[y-z] + ((temp4 << 8 | temp3) << 8);
-					if (y-z == whenToStart){
+					if (y == whenToStart){
 						if (started == 0){
 							alt_up_audio_enable_write_interrupt(audio_dev);
 							started = 1;
@@ -228,10 +206,8 @@ void read_wav_buffer (char *name, int size){
 						j=0;
 					}
 				}
-				z=0;
-				}
 				alt_up_sd_card_fclose(fileHandle);
-				alt_up_sd_card_fclose(fileHandle2);
+				//alt_up_sd_card_fclose(fileHandle2);
 				//a++;
 			}
 		}
@@ -322,4 +298,3 @@ void configure_audio()
 
 	alt_up_audio_reset_audio_core(audio_dev);
 }
-
