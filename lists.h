@@ -2,7 +2,7 @@
 typedef struct {
     song     dataitem;
     struct listelement *link;
-}               listelement;
+}listelement;
 
 
 //ADD, REMOVE, GET TO ITEM FUNCTIONS FOR QUEUES

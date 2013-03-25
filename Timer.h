@@ -39,6 +39,10 @@ void ReadData(void * context, unsigned int irq_id) {
 		command[num_to_receive] = '\0';
 		if (strstr(command, "play") != NULL) {
 			a = (int)command[4] - 48;
+			if (started == 1){
+				stop_sound();
+				started = 0;
+			}
 			playSong = 1;
 			//play_song(a);
 		} else if (strstr(command, "resume") != NULL) {
@@ -56,7 +60,10 @@ void ReadData(void * context, unsigned int irq_id) {
 			previous_sound();
 		} else if (strstr(command, "next") != NULL) {
 			next_sound();
+		} else if (strstr(command, "volume") != NULL){
+			set_volume(command);
 		}
+
 		printf("\n");
 	}
 	char data2 = IORD(LEDS_BASE, 0);

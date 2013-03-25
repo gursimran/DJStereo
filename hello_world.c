@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <system.h>
 char playSong = 0;
+char stop_currently_playing = 0;
+char pause = 0;
 #include "altera_up_sd_card_avalon_interface.h"
 #include <stdio.h>
 #include "altera_up_avalon_rs232.h"
@@ -50,11 +52,10 @@ int main(){
 	//init_button_pio(sound);
 	//alt_up_audio_enable_write_interrupt(audio_dev);
 	//play_song();
-
 	while(1){
 		if (playSong == 1){
+			printf("gonna play song\n");
 			play_song(a);
-			playSong = 0;
 		}
 	}
 

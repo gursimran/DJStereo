@@ -50,7 +50,7 @@ int getLengthOfSong(int total_size ){
 }
 
 
-int readSongsFromSDCard() {
+void readSongsFromSDCard() {
 	num_songs = 0;
 	char songFileName[20];
 	alt_up_sd_card_dev *device_reference = NULL;

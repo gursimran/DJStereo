@@ -65,7 +65,7 @@ void play_wav() {
 				ALT_UP_AUDIO_RIGHT);
 		alt_up_audio_write_fifo(audio_dev, &(soundBuffer[k]), 100,
 				ALT_UP_AUDIO_LEFT);
-		if ((190000*noTimes) + 100 + k >= size) {
+		if ((10000*noTimes) + 100 + k >= size) {
 			k = 0;
 			noTimes=0;
 			//playSong = 1;
@@ -79,7 +79,7 @@ void play_wav() {
 		} else{
 			k += 100;
 
-			if (k == 190000){
+			if (k == 10000){
 				k = 0;
 				noTimes++;
 			}
@@ -149,9 +149,9 @@ void read_wav_buffer (char *name, int size){
 				int fileHandle2;
 				short dataRead;
 				short dataRead2;
-				soundBuffer = (unsigned int *)malloc(sizeof(unsigned int)*190000);
+				soundBuffer = (unsigned int *)malloc(sizeof(unsigned int)*10000);
 				int i;
-				for (i=0;i<190000;i++){
+				for (i=0;i<10000;i++){
 					soundBuffer[i] = 0;
 				}
 				song x = getItemAt(songList, a+1);
@@ -161,8 +161,8 @@ void read_wav_buffer (char *name, int size){
 				int j=0;
 
 				stop_currently_playing = 0;
-				int whenToStart = 190000;
-				if (size/2 < 190000){
+				int whenToStart = 10000;
+				if (size/2 < 10000){
 					whenToStart = size/2;
 				}
 				int setVolume;
@@ -182,7 +182,7 @@ void read_wav_buffer (char *name, int size){
 					if (started == 1){
 						int x = 0;
 						while (pause == 1);
-						while(abs(y-k)<1000){
+						while(abs(y-k)<2){
 							x++;
 							if (x == 10000000){
 
@@ -193,7 +193,6 @@ void read_wav_buffer (char *name, int size){
 							}
 						}
 					}
-					while (z < 1000){
 					temp = dataRead ;
 					//temp3 = dataRead2;
 					dataRead = alt_up_sd_card_read(fileHandle);
@@ -207,17 +206,6 @@ void read_wav_buffer (char *name, int size){
 						soundBuffer[y] = soundBuffer[y]/2;
 					}
 					y++;
-					z++;
-				}
-				z = 0;
-				while(z <= 1000){
-					temp3 = dataRead2;
-					dataRead2 = alt_up_sd_card_read(fileHandle2);
-					temp4 = dataRead2;
-					dataRead2 = alt_up_sd_card_read(fileHandle2);
-					//y++;
-					z++;
-					soundBuffer[y-z] = soundBuffer[y-z] + ((temp4 << 8 | temp3) << 8);
 					if (y-z == whenToStart){
 						if (started == 0){
 							alt_up_audio_enable_write_interrupt(audio_dev);
@@ -227,8 +215,6 @@ void read_wav_buffer (char *name, int size){
 						y=0;
 						j=0;
 					}
-				}
-				z=0;
 				}
 				alt_up_sd_card_fclose(fileHandle);
 				alt_up_sd_card_fclose(fileHandle2);
