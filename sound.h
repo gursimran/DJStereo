@@ -8,7 +8,7 @@
 #include "assert.h"
 #include "sys/alt_irq.h"
 
-
+char mute = 0;
 char playing = 0;
 char started = 0;
 int k = 0;
@@ -24,7 +24,7 @@ void configure_audio();
 unsigned int * read_wav(char *name, unsigned int size);
 void play_wav();
 void read_wav_buffer (char *name, int size);
-int volume = 0;
+int volume = 5;
 int buffer_size = 10000;
 
 int size=0;
@@ -121,14 +121,27 @@ void previous_sound(){
 	//play_song(a);
 }
 
+void set_song( char * message){
+	char temp[20];
+	sscanf(message, "%s %d", temp, &a);
+	if (started == 1){
+		stop_sound();
+		started = 0;
+	}
+	playSong = 1;
+}
 void set_volume (char * message){
-	char temp[4];
-	temp[0] = message[6];
-	temp[1] = message[7];
-	temp[2] = message[8];
-	temp[3] = '\0';
-	int tempV = atoi(temp);
-	volume = 10 - (tempV/10);
+	int tempV;
+	char temp[20];
+	sscanf(message, "%s %d",temp, &tempV);
+	printf("tempV: %d\n", tempV);
+	if ((tempV/10) == 0){
+		mute = 1;
+	}
+	else {
+		mute = 0;
+		volume = (tempV/10) - 1;
+	}
 	printf("volume: %d\n", volume);
 }
 void read_wav_buffer (char *name, int size){
@@ -191,9 +204,13 @@ void read_wav_buffer (char *name, int size){
 					dataRead = alt_up_sd_card_read(fileHandle);
 					temp2 = dataRead ;
 					dataRead = alt_up_sd_card_read(fileHandle);
-					soundBuffer[y] = ((temp2 << 8 | temp) << 8);
+					soundBuffer[y] = ((temp2 << 8 | temp));
+					if((soundBuffer[y] & 0x8000) > 0)
+					{
+							soundBuffer[y] = soundBuffer[y] | 0xFFFF0000; // 2's complement
+					}
 					if(volume > 0){
-						soundBuffer[y] = soundBuffer[y]/2;
+						soundBuffer[y] = soundBuffer[y] << volume;
 					}
 					y++;
 					if (y == whenToStart){

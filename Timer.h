@@ -38,13 +38,7 @@ void ReadData(void * context, unsigned int irq_id) {
 		}
 		command[num_to_receive] = '\0';
 		if (strstr(command, "play") != NULL) {
-			a = (int)command[4] - 48;
-			if (started == 1){
-				stop_sound();
-				started = 0;
-			}
-			playSong = 1;
-			//play_song(a);
+			set_song(command);
 		} else if (strstr(command, "resume") != NULL) {
 			resume_sound();
 		} else if (strstr(command, "pause") != NULL) {
@@ -62,6 +56,8 @@ void ReadData(void * context, unsigned int irq_id) {
 			next_sound();
 		} else if (strstr(command, "volume") != NULL){
 			set_volume(command);
+		} else if (strstr(command, "DJplay") != NULL){
+
 		}
 
 		printf("\n");
