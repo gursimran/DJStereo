@@ -135,13 +135,7 @@ void set_volume (char * message){
 	char temp[20];
 	sscanf(message, "%s %d",temp, &tempV);
 	printf("tempV: %d\n", tempV);
-	if ((tempV/10) == 0){
-		mute = 1;
-	}
-	else {
-		mute = 0;
-		volume = (tempV/10) - 1;
-	}
+	volume = tempV/10;
 	printf("volume: %d\n", volume);
 }
 void read_wav_buffer (char *name, int size){
@@ -209,7 +203,10 @@ void read_wav_buffer (char *name, int size){
 					{
 							soundBuffer[y] = soundBuffer[y] | 0xFFFF0000; // 2's complement
 					}
-					if(volume > 0){
+					if(volume == 0){
+						soundBuffer[y] = 0;
+					}
+					else {
 						soundBuffer[y] = soundBuffer[y] << volume;
 					}
 					y++;

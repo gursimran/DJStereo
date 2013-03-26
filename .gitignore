@@ -1,6 +1,7 @@
 #gitignore
 .cproject
 .project
+.force_rebuild
 Makefile
 create-this-app
 module2.elf
