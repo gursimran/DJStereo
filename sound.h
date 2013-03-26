@@ -223,6 +223,7 @@ void read_wav_buffer (char *name, int size){
 						j=0;
 					}
 				}
+
 				alt_up_sd_card_fclose(fileHandle);
 				//alt_up_sd_card_fclose(fileHandle2);
 				//a++;
