@@ -37,30 +37,43 @@ void ReadData(void * context, unsigned int irq_id) {
 			printf("%c", data);
 		}
 		command[num_to_receive] = '\0';
-		if (strstr(command, "play") != NULL) {
+		printf("\nhere\n");
+		//pause_sound();
+		if (command[0] == 'p') {
 			set_song(command);
-		} else if (strstr(command, "resume") != NULL) {
+		} else if (command[0] == 'r') {
 			resume_sound();
-		} else if (strstr(command, "pause") != NULL) {
+		} else if (command[0] == 'x') {
 			pause_sound();
-		} else if (strstr(command, "stop") != NULL) {
+		} else if (command[0] == 's') {
 			stop_sound();
-		} else if (strstr(command, "list") != NULL) {
+		} else if (command[0] == 'l') {
+			//pause_sound();
+			//usleep(1000000);
+			//
+			stop_sound();
 			readSongsFromSDCard();
-			song_string( songList);
+			send_num_songs = 4;
+			song_string(songList);
 			sendData( songString);
 			free(songString);
-		} else if (strstr(command, "previous") != NULL) {
+			//resume_sound();
+		} else if (command[0] == 'b') {
 			previous_sound();
-		} else if (strstr(command, "next") != NULL) {
+		} else if (command[0] == 'n') {
 			next_sound();
-		} else if (strstr(command, "volume") != NULL){
+		} else if (command[0] == 'v'){
 			set_volume(command);
-		} else if (strstr(command, "DJplay") != NULL){
-
+		} else if (command[0] == 'a'){
+			song_string(songList);
+			sendData(songString);
+			free(songString);
+		} else if (command[0] == 'd'){
+			//set_dj(command);
 		}
 
 		printf("\n");
+		//resume_sound();
 	}
 	char data2 = IORD(LEDS_BASE, 0);
 	data2 = data2 ^ 0x00FF;

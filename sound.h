@@ -8,6 +8,8 @@
 #include "assert.h"
 #include "sys/alt_irq.h"
 
+int send_num_songs = 4;
+int sent_songs = 0;
 char mute = 0;
 char playing = 0;
 char started = 0;
@@ -39,6 +41,7 @@ static void init_button_pio( )
 }
 
 void play_song(int song_to_play){
+
 	a = song_to_play % num_songs;
 	//if (a<num_songs){
 		song b = getItemAt(songList, a);
@@ -55,7 +58,7 @@ void play_song(int song_to_play){
 		//a++;
 		while (started == 1);
 		started = 0;
-		playSong=1;;
+		playSong=1;
 		//alt_up_audio_enable_write_interrupt(audio_dev);
 		//alt_up_audio_enable_write_interrupt(audio_dev);
 	//}
@@ -92,7 +95,7 @@ void stop_sound(){
 	alt_up_audio_disable_write_interrupt(audio_dev);
 	stop_currently_playing = 1;
 	noTimes = 0;
-	started = 0;
+	started = 1;
 	k=0;
 	pause = 0;
 }
@@ -110,6 +113,7 @@ void resume_sound(){
 void next_sound(){
 	stop_sound();
 	++a;
+	started = 0;
 	playSong =1;
 	//play_song(a);
 }
@@ -117,6 +121,7 @@ void next_sound(){
 void previous_sound(){
 	stop_sound();
 	--a;
+	started = 0;
 	playSong=1;
 	//play_song(a);
 }
@@ -130,6 +135,11 @@ void set_song( char * message){
 	}
 	playSong = 1;
 }
+
+void set_dj(char * message){
+
+}
+
 void set_volume (char * message){
 	int tempV;
 	char temp[20];
