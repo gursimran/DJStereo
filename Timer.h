@@ -71,7 +71,6 @@ void ReadData(void * context, unsigned int irq_id) {
 		} else if (command[0] == 'd'){
 			//set_dj(command);
 		}
-
 		printf("\n");
 		//resume_sound();
 	}
