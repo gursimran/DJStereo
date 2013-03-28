@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <system.h>
 char playSong = 0;
+char djplaysong=0;
 char stop_currently_playing = 0;
 char pause = 0;
 #include "altera_up_sd_card_avalon_interface.h"
@@ -56,6 +57,10 @@ int main(){
 		if (playSong == 1){
 			printf("gonna play song\n");
 			play_song(a);
+		}
+		else if(djplaysong==1){
+			printf("gonna play dj songs\n");
+			DJPlay(song1, song2);
 		}
 	}
 

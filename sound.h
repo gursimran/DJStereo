@@ -8,14 +8,15 @@
 #include "assert.h"
 #include "sys/alt_irq.h"
 
-int send_num_songs = 4;
-int sent_songs = 0;
+
 char mute = 0;
 char playing = 0;
 char started = 0;
 int k = 0;
 alt_up_audio_dev * audio_dev=NULL;
 int a = 0;
+int song1;
+int song2;
 int y=0;
 unsigned int * soundBuffer;
 int noTimes = 0;
@@ -64,7 +65,48 @@ void play_song(int song_to_play){
 	//}
 }
 
+void DJPlay(int song1, int song2){
 
+	song1 = song1 % num_songs;
+	song2 = song2 % num_songs;
+
+	song song11= getItemAt(songList,song1);
+	song song22 = getItemAt(songList, song2);
+	song smallsong;
+	song bigsong;
+	int smallsize;
+
+	if(song11.Size>song22.Size){
+		size=song11.Size/2;
+		smallsize = song22.Size/2;
+		smallsong=song22;
+		bigsong = song11;
+	}
+	else{
+		size=song22.Size/2;
+		smallsize = song11.Size/2;
+		smallsong=song11;
+		bigsong=song22;
+	}
+
+	if(size > 1250000)
+		size = 1250000;
+	if(smallsize>1250000)
+		smallsize=1250000;
+
+	init_button_pio();
+	playSong = 0;
+	//unsigned char * sound;
+	usleep(1000000);
+	started = 0;
+	y=0;
+	soundBuffer = (unsigned int *)malloc(sizeof(unsigned int)*size);
+	soundBuffer = read_wav(bigsong.name, bigsong.Size);
+	read_wav2(smallsong.name, smallsong.Size);
+
+	alt_up_audio_enable_write_interrupt(audio_dev);
+
+}
 
 void play_wav() {
 		alt_up_audio_write_fifo(audio_dev, &(soundBuffer[k]), 100,
@@ -98,6 +140,7 @@ void stop_sound(){
 	started = 1;
 	k=0;
 	pause = 0;
+	free(soundBuffer);
 }
 
 void pause_sound(){
@@ -134,9 +177,18 @@ void set_song( char * message){
 		started = 0;
 	}
 	playSong = 1;
+	djplaysong=0;
 }
 
 void set_dj(char * message){
+	char temp[20];
+	sscanf(message, "%s %d %d",temp, &song1, &song2);
+	if (started == 1){
+		stop_sound();
+		started = 0;
+	}
+	djplaysong = 1;
+	playSong=0;
 
 }
 
@@ -263,6 +315,21 @@ unsigned int * read_wav(char *name, unsigned int size)
 	}
 	free(levelBricksToDraw);
 	return temp_array;
+}
+
+void read_wav2(char*name, unsigned int size){
+	unsigned char *levelBricksToDraw;
+	levelBricksToDraw = (unsigned char *) malloc(size * sizeof(unsigned char));
+	readWavFromSDCARD(name, levelBricksToDraw);
+
+	int x;
+	int y = 0;
+	for (x = 0; x < size; x += 2) {
+		unsigned int sample = (levelBricksToDraw[x + 1] << 8 | levelBricksToDraw[x]) << 8; //original
+		soundBuffer[y] = sample;
+		y++;
+	}
+	free(levelBricksToDraw);
 }
 
 /////////////////////////////////////////*******?//////////////////////////////////////////////

@@ -54,6 +54,7 @@ void ReadData(void * context, unsigned int irq_id) {
 			stop_sound();
 			readSongsFromSDCard();
 			send_num_songs = 4;
+			sent_songs = 0;
 			song_string(songList);
 			sendData( songString);
 			free(songString);
@@ -71,6 +72,7 @@ void ReadData(void * context, unsigned int irq_id) {
 		} else if (command[0] == 'd'){
 			//set_dj(command);
 		}
+
 		printf("\n");
 		//resume_sound();
 	}
