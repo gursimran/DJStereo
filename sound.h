@@ -169,6 +169,8 @@ void DJPlay(int song1, int song2){
 		else {
 			temp = temp << djvolume1;
 		}
+		if(m>size1)
+			temp = 0;
 		soundBuffer[j] = temp;
 		temp = (soundBuffer2DJ[i+1] << 8) | soundBuffer2DJ[i];
 		if((temp & 0x8000) > 0)
@@ -181,12 +183,13 @@ void DJPlay(int song1, int song2){
 		else {
 			temp = temp << djvolume2;
 		}
+		if (i > size2)
+			temp = 0;
 		soundBuffer[j] = soundBuffer[j] + (temp);
 		j++;
 		if(speed1==1){
 			m=m+2;
 		}
-
 		else if(speed1==2){
 			m=m+4;
 		}
