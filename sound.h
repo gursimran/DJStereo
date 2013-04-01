@@ -36,8 +36,8 @@ void read_wav_buffer (char *name, int size);
 int volume = 5;
 int djvolume1=5;
 int djvolume2 = 5;
-int speed1=0;
-int speed2=0;
+int speed1=1;
+int speed2=1;
 int stop=1;
 
 int buffer_size = 10000;
@@ -329,8 +329,8 @@ void set_dj(char * message){
 	char temp[20];
 	sscanf(message, "%s %d %d",temp, &song1, &song2);
 	playSong=0;
-	speed1=0;
-	speed2=0;
+	speed1=1;
+	speed2=1;
 	stop=0;
 	djplaysong = 1;
 
