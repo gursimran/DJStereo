@@ -38,6 +38,7 @@ int djvolume1=5;
 int djvolume2 = 5;
 int speed1=0;
 int speed2=0;
+int stop=1;
 
 int buffer_size = 10000;
 
@@ -139,7 +140,9 @@ void DJPlay(int song1, int song2){
 	int j = 0;
 	int x = 0;
 	int startedDJ = 0;
-	while (i<size*2 || m<smallsize*2){
+	int size1 = size*2;
+	int size2=smallsize*2;
+	while ((i<size2 || m<size1)&&stop==0){
 		//Pausing reading of file if reading of file catches up to where playing of file is
 		if (startedDJ == 1){
 		while(abs(j-k)<2){
@@ -178,19 +181,37 @@ void DJPlay(int song1, int song2){
 		}
 		soundBuffer[j] = soundBuffer[j] + (temp);
 		j++;
-		if(speed1==0)
+		if(speed1==1){
 			m=m+2;
-		else if(speed1==1)
-			m=m+4;
-		else if (speed1==-1){
-			m=m+1;
+			size = size1 / 2;
 		}
-		if(speed2==0)
+
+		else if(speed1==2){
+			m=m+4;
+			size = size1/4;
+		}
+		else if (speed1==0){
+			m=m+1;
+			size = size1;
+		}
+		if(speed2==1){
 			i=i+2;
-		else if(speed2==1)
+			smallsize=size2/2;
+		}
+		else if(speed2==2){
 			i=i+4;
-		else if (speed2==-1){
+			smallsize=size2/4;
+		}
+		else if (speed2==0){
 			i=i+1;
+			smallsize=size2;
+		}
+
+		if(smallsize>size){
+			int tempsize;
+			tempsize = size;
+			size = smallsize;
+			smallsize = tempsize;
 		}
 
 
@@ -258,6 +279,7 @@ void stop_sound(){
 	started = 1;
 	k=0;
 	pause = 0;
+	stop=1;
 	free(soundBuffer);
 }
 
@@ -309,6 +331,7 @@ void set_dj(char * message){
 	playSong=0;
 	speed1=0;
 	speed2=0;
+	stop=0;
 	djplaysong = 1;
 
 	printf("djPlaySong: %d\n", djplaysong);
