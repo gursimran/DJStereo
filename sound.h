@@ -13,6 +13,8 @@ char mute = 0;
 char playing = 0;
 char started = 0;
 int k = 0;
+int i =0;
+int m=0;
 alt_up_audio_dev * audio_dev=NULL;
 int a = 0;
 int song1;
@@ -135,8 +137,8 @@ void DJPlay(int song1, int song2){
 		whenToStart = size;
 	}
 	k=0;
-	int i =0;
-	int m=0;
+	i =0;
+	m=0;
 	int j = 0;
 	int x = 0;
 	int startedDJ = 0;
@@ -183,36 +185,24 @@ void DJPlay(int song1, int song2){
 		j++;
 		if(speed1==1){
 			m=m+2;
-			size = size1 / 2;
 		}
 
 		else if(speed1==2){
 			m=m+4;
-			size = size1/4;
 		}
 		else if (speed1==0){
 			m=m+1;
-			size = size1;
 		}
 		if(speed2==1){
 			i=i+2;
-			smallsize=size2/2;
 		}
 		else if(speed2==2){
 			i=i+4;
-			smallsize=size2/4;
 		}
 		else if (speed2==0){
 			i=i+1;
-			smallsize=size2;
 		}
 
-		if(smallsize>size){
-			int tempsize;
-			tempsize = size;
-			size = smallsize;
-			smallsize = tempsize;
-		}
 
 
 		if (j == whenToStart){
@@ -255,7 +245,7 @@ void dj_play_wav() {
 				ALT_UP_AUDIO_RIGHT);
 		alt_up_audio_write_fifo(audio_dev, &(soundBuffer[k]), 100,
 				ALT_UP_AUDIO_LEFT);
-		if ((buffer_size*noTimes) + 100 + k >= size) {
+		if ((buffer_size*noTimes) + 100 + k >= m && (buffer_size*noTimes) + 100 + k >= i) {
 			k = 0;
 			noTimes=0;
 			alt_up_audio_disable_write_interrupt(audio_dev);
