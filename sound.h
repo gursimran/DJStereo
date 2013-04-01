@@ -85,6 +85,7 @@ void DJPlay(int song1, int song2){
 
 	song1 = song1 % num_songs;
 	song2 = song2 % num_songs;
+	djplaysong=0;
 
 	song song11= getItemAt(songList,song1);
 	song song22 = getItemAt(songList, song2);
@@ -134,8 +135,10 @@ void DJPlay(int song1, int song2){
 	int i =0;
 	int j = 0;
 	int x = 0;
+	int startedDJ = 0;
 	while (i<size*2){
 		//Pausing reading of file if reading of file catches up to where playing of file is
+		if (startedDJ == 1){
 		while(abs(j-k)<2){
 			x++;
 			if (x == 10000000){
@@ -146,7 +149,7 @@ void DJPlay(int song1, int song2){
 				break;
 			}
 		}
-
+		}
 		unsigned int temp = (soundBuffer1DJ[i+1] << 8) | soundBuffer1DJ[i];
 		if((temp & 0x8000) > 0)
 		{
@@ -177,9 +180,9 @@ void DJPlay(int song1, int song2){
 		if (j == whenToStart){
 			alt_up_audio_enable_write_interrupt(audio_dev);
 			j=0;
+			startedDJ = 1;
 		}
 	}
-
 }
 
 void play_wav() {
@@ -279,11 +282,16 @@ void set_song( char * message){
 }
 
 void set_dj(char * message){
-	stop_sound();
+	if (started == 1){
+		stop_sound();
+		started = 0;
+	}
 	printf("in dj\n");
 	char temp[20];
 	sscanf(message, "%s %d %d",temp, &song1, &song2);
+	playSong=0;
 	djplaysong = 1;
+
 	printf("djPlaySong: %d\n", djplaysong);
 	//playSong=0;
 }
@@ -435,19 +443,9 @@ void read_wav(char *name, unsigned int size)
 
 				// Keep reading till eof
 				while (dataRead > -1 && j < 3000000) {
-					temp = dataRead;
-					j++;
+					soundBuffer1DJ[j] = dataRead;
 					dataRead = alt_up_sd_card_read(fileHandle);
-					temp2 = dataRead;
 					j++;
-					dataRead = alt_up_sd_card_read(fileHandle);
-					soundBuffer[i] = ((temp2 << 8) | temp);
-					if((soundBuffer[i] & 0x8000) > 0)
-					{
-							soundBuffer[i] = soundBuffer[i] | 0xFFFF0000; // 2's complement
-					}
-					soundBuffer[i] = soundBuffer[i] << 7;
-					i++;
 				}
 
 				printf("number of reads from file: %d, %s\n", j, name);
@@ -502,20 +500,9 @@ void read_wav2(char*name, unsigned int size){
 
 				// Keep reading till eof
 				while (dataRead > -1 && j < 3000000) {
-					temp = dataRead;
-					j++;
+					soundBuffer2DJ[j] = dataRead;
 					dataRead = alt_up_sd_card_read(fileHandle);
-					temp2 = dataRead;
 					j++;
-					dataRead = alt_up_sd_card_read(fileHandle);
-					tempSample = ((temp2 << 8) | temp);
-					if((tempSample & 0x8000) > 0)
-					{
-							tempSample = tempSample | 0xFFFF0000; // 2's complement
-					}
-					tempSample = tempSample << 7;
-					soundBuffer[i] = soundBuffer[i] + tempSample;
-					i++;
 				}
 
 				printf("number of reads from file: %d, %s\n", j, name);
