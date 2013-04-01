@@ -51,11 +51,11 @@ int getLengthOfSong(int total_size) {
 
 void getSongName(char * name, char * songname, char * songartist) {
 	int fileHandle;
-	short dataRead, dataRead2, dataRead3;
+	short dataRead, dataRead2, dataRead3, dataRead4;
 	// Get file handle
 	fileHandle = alt_up_sd_card_fopen(name, false);
 	int n = 0;
-	free(data);
+	//free(data);
 	data = (unsigned char *) malloc(30 * sizeof(unsigned char));
 	while (n < 56) {
 		//Read 56 times to get to the right point in the file to read song name
@@ -66,7 +66,7 @@ void getSongName(char * name, char * songname, char * songartist) {
 	dataRead = alt_up_sd_card_read(fileHandle);
 
 	//Read song name
-	while(dataRead!= 0){
+	while(dataRead!= 0 || n <2){
 		data[n] = dataRead;
 		n++;
 		dataRead = alt_up_sd_card_read(fileHandle);
@@ -76,18 +76,18 @@ void getSongName(char * name, char * songname, char * songartist) {
 	strcpy(songname, data);
 
 
-/*	dataRead3=1;
+	dataRead3=1;
 	dataRead2=2;
+	dataRead4=3;
 	dataRead=alt_up_sd_card_read(fileHandle);
 	n=0;
-	do{
-		if(dataRead2 == 0)
+
+	while((!(dataRead == dataRead2 && dataRead2 == dataRead3 )&& n<10)){
 			dataRead3=dataRead2;
-		if(dataRead == 0)
 			dataRead2=dataRead;
 		dataRead=alt_up_sd_card_read(fileHandle);
 		n++;
-	}while((dataRead != dataRead2 && dataRead2 != dataRead3 && n < 12)|| n<6);
+	}
 
 	dataRead = alt_up_sd_card_read(fileHandle);
 	n=0;
@@ -98,8 +98,6 @@ void getSongName(char * name, char * songname, char * songartist) {
 	}
 	data[n]='\0';
 	strcpy(songartist,data);
-	free(data);*/
-	strcpy(songartist,"test");
 
 	alt_up_sd_card_fclose(fileHandle);
 }
@@ -140,6 +138,7 @@ void readSongsFromSDCard() {
 			x.LENGTH = getLengthOfSong(x.Size);
 
 			getSongName(songFileName,x.realname, x.artist);
+			free(data);
 
 			strcpy(x.name, songFileName);
 			songList = AddItem(songList, x);
@@ -152,6 +151,7 @@ void readSongsFromSDCard() {
 				x.LENGTH = getLengthOfSong(x.Size);
 
 				getSongName(songFileName,x.realname, x.artist);
+				free(data);
 
 				strcpy(x.name, songFileName);
 				songList = AddItem(songList, x);

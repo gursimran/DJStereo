@@ -40,6 +40,8 @@ listelement * AddItem (listelement * listpointer, song data) {
         listpointer -> link = NULL;
         listpointer -> dataitem.ID = data.ID;
         strcpy(listpointer -> dataitem.name, data.name);
+        strcpy(listpointer->dataitem.artist, data.artist);
+        strcpy(listpointer->dataitem.realname, data.realname);
         listpointer -> dataitem.LENGTH = data.LENGTH;
         listpointer -> dataitem.Size = data.Size;
         num_songs++;
