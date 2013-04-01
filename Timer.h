@@ -70,7 +70,9 @@ void ReadData(void * context, unsigned int irq_id) {
 			sendData(songString);
 			free(songString);
 		} else if (command[0] == 'd'){
-			//set_dj(command);
+			set_dj(command);
+		} else if (command[0]=='i'){
+			set_djvolume(command);
 		}
 
 		printf("\n");
