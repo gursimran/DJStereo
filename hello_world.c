@@ -37,6 +37,8 @@ int main(){
 		printf("%s\n", a.name);
 		printf("%d\n", a.LENGTH);
 		printf("%d\n", a.Size);
+		printf("%s\n", a.realname);
+		printf("%s\n", a.artist);
 	}
 
 	//init timer

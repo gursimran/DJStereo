@@ -6,49 +6,103 @@
 listelement *songList;
 unsigned char * data;
 
-
-int getSizeOfSong(char * name){
+int getSizeOfSong(char * name) {
 	int fileHandle;
-		short dataRead;
-		// Get file handle
-		fileHandle = alt_up_sd_card_fopen(name, false);
-		int n = 0;
-		data = (unsigned char *) malloc (32 * sizeof (unsigned char));
-		// Get first 8 bytes of file
-		while (n < 32){
-			// If new line character then write data to next line
-			// and (increment column)
-			dataRead = alt_up_sd_card_read(fileHandle);
-			//dataRead=dataRead & '0000000011111111';
-			data[n] = dataRead;
-			//Print the bytes that are read
-			//printf("%x ",data[n]);
-			n++;
-		}
+	short dataRead;
+	// Get file handle
+	fileHandle = alt_up_sd_card_fopen(name, false);
+	int n = 0;
+	data = (unsigned char *) malloc(32 * sizeof(unsigned char));
+	// Get first 8 bytes of file
+	while (n < 32) {
+		// If new line character then write data to next line
+		// and (increment column)
+		dataRead = alt_up_sd_card_read(fileHandle);
+		//dataRead=dataRead & '0000000011111111';
+		data[n] = dataRead;
+		//Print the bytes that are read
+		//printf("%x ",data[n]);
+		n++;
+	}
 
-		int total_size = (data[7] << 24) | (data[6] << 16) | (data[5] << 8) | data[4];
-		//printf("%d ", total_size);
+	int total_size = (data[7] << 24) | (data[6] << 16) | (data[5] << 8)
+			| data[4];
+	//printf("%d ", total_size);
 
-		total_size +=8;
-		alt_up_sd_card_fclose(fileHandle);
+	total_size += 8;
+	alt_up_sd_card_fclose(fileHandle);
 
-		return total_size;
+	return total_size;
 }
-int getLengthOfSong(int total_size ){
-
+int getLengthOfSong(int total_size) {
 
 	//Printing the size of the file in bytes as well as the byte rate
 	//printf("%d\n", total_size);
 	//
-	int byte_rate = (data[31] << 24) | (data[30] << 16) | (data[29] << 8) | data[28];
+	int byte_rate = (data[31] << 24) | (data[30] << 16) | (data[29] << 8)
+			| data[28];
 	//printf("%d\n", byte_rate);
-	int time = (total_size * 1000.0)/byte_rate;
+	int time = (total_size * 1000.0) / byte_rate;
 
 	//Close file
 	free(data);
 	return time;
 }
 
+void getSongName(char * name, char * songname, char * songartist) {
+	int fileHandle;
+	short dataRead, dataRead2, dataRead3;
+	// Get file handle
+	fileHandle = alt_up_sd_card_fopen(name, false);
+	int n = 0;
+	free(data);
+	data = (unsigned char *) malloc(30 * sizeof(unsigned char));
+	while (n < 56) {
+		//Read 56 times to get to the right point in the file to read song name
+		dataRead = alt_up_sd_card_read(fileHandle);
+		n++;
+	}
+	n=0;
+	dataRead = alt_up_sd_card_read(fileHandle);
+
+	//Read song name
+	while(dataRead!= 0){
+		data[n] = dataRead;
+		n++;
+		dataRead = alt_up_sd_card_read(fileHandle);
+	}
+
+	data[n]='\0';
+	strcpy(songname, data);
+
+
+/*	dataRead3=1;
+	dataRead2=2;
+	dataRead=alt_up_sd_card_read(fileHandle);
+	n=0;
+	do{
+		if(dataRead2 == 0)
+			dataRead3=dataRead2;
+		if(dataRead == 0)
+			dataRead2=dataRead;
+		dataRead=alt_up_sd_card_read(fileHandle);
+		n++;
+	}while((dataRead != dataRead2 && dataRead2 != dataRead3 && n < 12)|| n<6);
+
+	dataRead = alt_up_sd_card_read(fileHandle);
+	n=0;
+	while(dataRead!= 0){
+		data[n] = dataRead;
+		n++;
+		dataRead = alt_up_sd_card_read(fileHandle);
+	}
+	data[n]='\0';
+	strcpy(songartist,data);
+	free(data);*/
+	strcpy(songartist,"test");
+
+	alt_up_sd_card_fclose(fileHandle);
+}
 
 void readSongsFromSDCard() {
 	num_songs = 0;
@@ -84,6 +138,9 @@ void readSongsFromSDCard() {
 			x.ID = num_songs;
 			x.Size = getSizeOfSong(songFileName);
 			x.LENGTH = getLengthOfSong(x.Size);
+
+			getSongName(songFileName,x.realname, x.artist);
+
 			strcpy(x.name, songFileName);
 			songList = AddItem(songList, x);
 		}
@@ -92,7 +149,10 @@ void readSongsFromSDCard() {
 				song x;
 				x.ID = num_songs;
 				x.Size = getSizeOfSong(songFileName);
-				x.LENGTH=getLengthOfSong(x.Size);
+				x.LENGTH = getLengthOfSong(x.Size);
+
+				getSongName(songFileName,x.realname, x.artist);
+
 				strcpy(x.name, songFileName);
 				songList = AddItem(songList, x);
 			}
