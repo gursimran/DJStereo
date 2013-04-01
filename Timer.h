@@ -78,6 +78,8 @@ void ReadData(void * context, unsigned int irq_id) {
 			set_dj(command);
 		} else if (command[0]=='i'){
 			set_djvolume(command);
+		} else if (command[0] == 't'){
+			set_djspeed(command);
 		}
 
 		printf("\n");

@@ -36,6 +36,8 @@ void read_wav_buffer (char *name, int size);
 int volume = 5;
 int djvolume1=5;
 int djvolume2 = 5;
+int speed1=0;
+int speed2=0;
 
 int buffer_size = 10000;
 
@@ -133,10 +135,11 @@ void DJPlay(int song1, int song2){
 	}
 	k=0;
 	int i =0;
+	int m=0;
 	int j = 0;
 	int x = 0;
 	int startedDJ = 0;
-	while (i<size*2){
+	while (i<size*2 || m<smallsize*2){
 		//Pausing reading of file if reading of file catches up to where playing of file is
 		if (startedDJ == 1){
 		while(abs(j-k)<2){
@@ -150,7 +153,7 @@ void DJPlay(int song1, int song2){
 			}
 		}
 		}
-		unsigned int temp = (soundBuffer1DJ[i+1] << 8) | soundBuffer1DJ[i];
+		unsigned int temp = (soundBuffer1DJ[m+1] << 8) | soundBuffer1DJ[m];
 		if((temp & 0x8000) > 0)
 		{
 			temp = temp | 0xFFFF0000; // 2's complement
@@ -175,7 +178,21 @@ void DJPlay(int song1, int song2){
 		}
 		soundBuffer[j] = soundBuffer[j] + (temp);
 		j++;
-		i=i+2;
+		if(speed1==0)
+			m=m+2;
+		else if(speed1==1)
+			m=m+4;
+		else if (speed1==-1){
+			m=m+1;
+		}
+		if(speed2==0)
+			i=i+2;
+		else if(speed2==1)
+			i=i+4;
+		else if (speed2==-1){
+			i=i+1;
+		}
+
 
 		if (j == whenToStart){
 			alt_up_audio_enable_write_interrupt(audio_dev);
@@ -290,6 +307,8 @@ void set_dj(char * message){
 	char temp[20];
 	sscanf(message, "%s %d %d",temp, &song1, &song2);
 	playSong=0;
+	speed1=0;
+	speed2=0;
 	djplaysong = 1;
 
 	printf("djPlaySong: %d\n", djplaysong);
@@ -306,6 +325,12 @@ void set_djvolume (char * message){
 	djvolume1 = tempV/10;
 	djvolume2 = tempV2/10;
 	printf("volume1: %d volume2: %d\n", djvolume1, djvolume2);
+}
+
+void set_djspeed (char * message){
+	char temp[20];
+	sscanf(message, "%s %d %d",temp, &speed1, &speed2);
+	printf("speed1: %d\n speed2: %d\n", speed1, speed2);
 }
 
 void set_volume (char * message){
