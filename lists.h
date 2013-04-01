@@ -112,9 +112,10 @@ void song_string(listelement * listpointer){
 		strcat(songString, ":");
 		sprintf(k, "%d", m.LENGTH);
 		strcat(songString, k);
-		if(l== (num_songs-1)){
+		if(sent_songs-send_num_songs+l== (num_songs-1)){
 			if (sent_songs == num_songs){
 				strcat(songString, "|xx");
+				startedSendingList = 0;
 			}
 			strcat(songString, "\0");
 		}

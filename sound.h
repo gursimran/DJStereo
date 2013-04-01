@@ -21,6 +21,7 @@ int y=0;
 unsigned int * soundBuffer;
 unsigned char * soundBuffer1DJ;
 unsigned char * soundBuffer2DJ;
+
 int noTimes = 0;
 int reach1000;
 char readMore = 0;
@@ -178,6 +179,7 @@ void DJPlay(int song1, int song2){
 			j=0;
 		}
 	}
+
 }
 
 void play_wav() {
@@ -284,7 +286,6 @@ void set_dj(char * message){
 	djplaysong = 1;
 	printf("djPlaySong: %d\n", djplaysong);
 	//playSong=0;
-
 }
 
 void set_djvolume (char * message){

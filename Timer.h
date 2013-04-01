@@ -3,6 +3,8 @@
 
 #include "system.h"
 
+
+
 int s = 0;
 //char playSong = 0;
 
@@ -48,17 +50,18 @@ void ReadData(void * context, unsigned int irq_id) {
 		} else if (command[0] == 's') {
 			stop_sound();
 		} else if (command[0] == 'l') {
-			//pause_sound();
-			//usleep(1000000);
-			//
-			stop_sound();
-			readSongsFromSDCard();
+			if (started == 1){
+				pause_sound();
+			}
 			send_num_songs = 4;
 			sent_songs = 0;
 			song_string(songList);
 			sendData( songString);
 			free(songString);
-			//resume_sound();
+			startedSendingList = 1;
+			if (started == 1){
+				resume_sound();
+			}
 		} else if (command[0] == 'b') {
 			previous_sound();
 		} else if (command[0] == 'n') {
@@ -66,9 +69,11 @@ void ReadData(void * context, unsigned int irq_id) {
 		} else if (command[0] == 'v'){
 			set_volume(command);
 		} else if (command[0] == 'a'){
+			if (startedSendingList == 1){
 			song_string(songList);
 			sendData(songString);
 			free(songString);
+			}
 		} else if (command[0] == 'd'){
 			set_dj(command);
 		} else if (command[0]=='i'){
@@ -83,14 +88,6 @@ void ReadData(void * context, unsigned int irq_id) {
 	IOWR(LEDS_BASE, 0, data2);
 	IOWR(TIMER_0_BASE, 0, 0);
 }
-
-/*void TimerInterrupt(void * context, unsigned int irq_id) {
-	char data = IORD(LEDS_BASE, 0);
-	data = data ^ 0x00FF;
-	IOWR(LEDS_BASE, 0, data);
-
-	IOWR(TIMER_0_BASE, 0, 0);
-}*/
 
 static void init_Timer() {
 	IOWR(TIMER_0_BASE + 8, 0, 0x7840);
