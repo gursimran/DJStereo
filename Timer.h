@@ -53,7 +53,7 @@ void ReadData(void * context, unsigned int irq_id) {
 			if (started == 1){
 				pause_sound();
 			}
-			send_num_songs = 4;
+			send_num_songs = 3;
 			sent_songs = 0;
 			song_string(songList);
 			sendData( songString);

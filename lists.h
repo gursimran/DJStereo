@@ -4,7 +4,7 @@ typedef struct {
     struct listelement *link;
 }listelement;
 
-int send_num_songs = 4;
+int send_num_songs = 3;
 int sent_songs = 0;
 //ADD, REMOVE, GET TO ITEM FUNCTIONS FOR QUEUES
 listelement * AddItem (listelement * listpointer, song data);
@@ -112,10 +112,12 @@ void song_string(listelement * listpointer){
 			strcat(songString, k);
 		}
 		strcat(songString, ":");
-		strcat(songString, m.name);
+		strcat(songString, m.realname);
 		strcat(songString, ":");
 		sprintf(k, "%d", m.LENGTH);
 		strcat(songString, k);
+		strcat(songString, ":");
+		strcat(songString, m.artist);
 		if(sent_songs-send_num_songs+l== (num_songs-1)){
 			if (sent_songs == num_songs){
 				strcat(songString, "|xx");
