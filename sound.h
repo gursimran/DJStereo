@@ -32,6 +32,7 @@ char readMore = 0;
 void readWavFromSDCARD(char *name, unsigned char *levelBricksToDraw);
 void configure_audio();
 void read_wav(char *name, unsigned int size);
+void read_FX(char *name, unsigned int size, unsigned char * buffer);
 
 void read_wav2(char*name, unsigned int size);
 void play_wav();
@@ -86,9 +87,7 @@ void play_song(int song_to_play) {
 	//alt_up_audio_enable_write_interrupt(audio_dev);
 	//}
 }
-void readFX(){
 
-}
 
 void DJPlay(int song1, int song2) {
 
@@ -137,9 +136,9 @@ void DJPlay(int song1, int song2) {
 	FX1Buffer = (unsigned char *) malloc(sizeof(unsigned char)*fx1.Size);
 	FX2Buffer = (unsigned char *) malloc(sizeof(unsigned char)*fx2.Size);
 	FX3Buffer = (unsigned char *) malloc(sizeof(unsigned char)*fx3.Size);
-	readFX(fx1.name,fx1.Size,FX1Buffer );
-	readFX(fx2.name,fx2.Size,FX2Buffer );
-	readFX(fx3.name,fx3.Size,FX3Buffer );
+	read_FX(fx1.name,fx1.Size,FX1Buffer );
+	read_FX(fx2.name,fx2.Size,FX2Buffer );
+	read_FX(fx3.name,fx3.Size,FX3Buffer );
 
 	read_wav(bigsong.name, size);
 	read_wav2(smallsong.name, smallsize);
