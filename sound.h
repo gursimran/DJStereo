@@ -644,21 +644,6 @@ void read_wav(char *name, unsigned int size) {
 			}
 		}
 	}
-	//	readWavFromSDCARD(name, soundBuffer);
-	//
-	//	unsigned int * temp_array;
-	//	temp_array = (unsigned int *) malloc((size / 2) * sizeof(unsigned int));
-	//	int x;
-	//	int y = 0;
-	//	for (x = 0; x < size; x += 2) {
-	//		unsigned int sample = (levelBricksToDraw[x + 1] << 8 | levelBricksToDraw[x]) << 8; //original
-	//		temp_array[y] = sample;
-	//		if(y%1000==0)
-	//			printf("%d",y);
-	//		y++;
-	//	}
-	//	free(levelBricksToDraw);
-	//	return temp_array;
 }
 
 void read_wav2(char*name, unsigned int size) {
