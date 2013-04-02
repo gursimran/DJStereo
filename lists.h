@@ -11,6 +11,7 @@ listelement * AddItem (listelement * listpointer, song data);
 listelement * RemoveItem (listelement * listpointer);
 song getItem (listelement * listpointer);
 int num_songs = 0;
+int num_FX = 0;
 char * songString;
 
 //ADDITEM TO QUEUE
@@ -48,7 +49,41 @@ listelement * AddItem (listelement * listpointer, song data) {
         return listpointer;
     }
 }
+//ADDITEM TO QUEUE
+listelement * AddItem2 (listelement * listpointer, song data) {
+    listelement * lp = listpointer;
+    //IF LIST IS NOT NULL THEN CREATE A NEW STRUCT THEN ADD THE ITEM AND POINT THE LISTPOINTER OF THE LAST ITEM BEFORE ADDING TO THE NEW STRUCT
 
+    if (listpointer != NULL) {
+    	while (listpointer -> link != NULL)
+            listpointer = listpointer -> link;
+
+        listpointer -> link = (struct listelement  *) malloc (sizeof (listelement));
+        listpointer = listpointer -> link;
+        listpointer -> link = NULL;
+        listpointer -> dataitem.ID = data.ID;
+        strcpy(listpointer -> dataitem.name, data.name);
+        strcpy(listpointer->dataitem.artist, data.artist);
+        strcpy(listpointer->dataitem.realname, data.realname);
+        listpointer -> dataitem.LENGTH = data.LENGTH;
+        listpointer -> dataitem.Size = data.Size;
+        num_FX++;
+        return lp;
+    }
+    //IF LIST IS EMPTY CREATE A NEW STRUCT AND ADD THE ITEM
+    else {
+    	listpointer = (struct listelement  *) malloc (sizeof (listelement));
+        listpointer -> link = NULL;
+        listpointer -> dataitem.ID = data.ID;
+        strcpy(listpointer -> dataitem.name, data.name);
+        strcpy(listpointer->dataitem.artist, data.artist);
+        strcpy(listpointer->dataitem.realname, data.realname);
+        listpointer -> dataitem.LENGTH = data.LENGTH;
+        listpointer -> dataitem.Size = data.Size;
+        num_FX++;
+        return listpointer;
+    }
+}
 
 //REMOVE ITEM FROM QUEUE
 listelement * RemoveItem (listelement * listpointer) {

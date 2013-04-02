@@ -80,6 +80,15 @@ void ReadData(void * context, unsigned int irq_id) {
 			set_djvolume(command);
 		} else if (command[0] == 't'){
 			set_djspeed(command);
+		} else if(command[0]=='1'){
+			//play FX1
+			FX1=1;
+		} else if(command[0]=='2'){
+			//play FX2
+			FX2=1;
+		} else if (command[0]=='3'){
+			//play FX3
+			FX3=1;
 		}
 
 		printf("\n");
