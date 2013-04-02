@@ -89,6 +89,10 @@ void ReadData(void * context, unsigned int irq_id) {
 		} else if (command[0]=='3'){
 			//play FX3
 			FX3=1;
+		} else if (command[0]=='w'){
+			rewind_dj(command);
+		} else if (command[0] == 'y'){
+			fastforward_dj(command);
 		}
 
 		printf("\n");

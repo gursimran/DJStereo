@@ -12,8 +12,8 @@ char mute = 0;
 char playing = 0;
 char started = 0;
 int k = 0;
-/*int i = 0;
-int m = 0;*/
+int i = 0;
+int m = 0;
 alt_up_audio_dev * audio_dev = NULL;
 int a = 0;
 int song1;
@@ -32,7 +32,7 @@ char readMore = 0;
 void readWavFromSDCARD(char *name, unsigned char *levelBricksToDraw);
 void configure_audio();
 void read_wav(char *name, unsigned int size);
-
+void read_FX(char *name, unsigned int size, unsigned char * buffer);
 void read_wav2(char*name, unsigned int size);
 void play_wav();
 void dj_play_wav();
@@ -86,9 +86,6 @@ void play_song(int song_to_play) {
 	//alt_up_audio_enable_write_interrupt(audio_dev);
 	//}
 }
-void readFX(){
-
-}
 
 void DJPlay(int song1, int song2) {
 
@@ -137,9 +134,9 @@ void DJPlay(int song1, int song2) {
 	FX1Buffer = (unsigned char *) malloc(sizeof(unsigned char)*fx1.Size);
 	FX2Buffer = (unsigned char *) malloc(sizeof(unsigned char)*fx2.Size);
 	FX3Buffer = (unsigned char *) malloc(sizeof(unsigned char)*fx3.Size);
-	readFX(fx1.name,fx1.Size,FX1Buffer );
-	readFX(fx2.name,fx2.Size,FX2Buffer );
-	readFX(fx3.name,fx3.Size,FX3Buffer );
+	read_FX(fx1.name,fx1.Size,FX1Buffer );
+	read_FX(fx2.name,fx2.Size,FX2Buffer );
+	read_FX(fx3.name,fx3.Size,FX3Buffer );
 
 	read_wav(bigsong.name, size);
 	read_wav2(smallsong.name, smallsize);
@@ -154,8 +151,8 @@ void DJPlay(int song1, int song2) {
 	int fx1point=0;
 	int fx2point=0;
 	int fx3point=0;
-	int i = 0;
-	int m = 0;
+	i = 0;
+	m = 0;
 	int j = 0;
 	int x = 0;
 	int startedDJ = 0;
@@ -424,6 +421,50 @@ void set_djspeed(char * message) {
 	char temp[20];
 	sscanf(message, "%s %d %d", temp, &speed1, &speed2);
 	printf("speed1: %d\n speed2: %d\n", speed1, speed2);
+}
+
+void rewind_dj(char * message){
+	char temp[20];
+	int rewind1;
+	int rewind2;
+
+	sscanf(message, "%s %d %d", temp, &rewind1, &rewind2);
+	if(rewind1 == 1){
+		rewind1=0;
+		if(m > 250000)
+			m-=250000;
+		else
+			m=0;
+	}
+	if (rewind2==1){
+		rewind2=0;
+		if(i >250000)
+			i-=250000;
+		else
+			i=0;
+	}
+}
+
+void fastforward_dj(char * message){
+	char temp[20];
+	int ff1;
+	int ff2;
+
+	sscanf(message, "%s %d %d", temp, &ff1, &ff2);
+	if(ff1 == 1){
+		ff1=0;
+		if(m > 250000)
+			m-=250000;
+		else
+			m=0;
+	}
+	if (ff2==1){
+		ff2=0;
+		if(i >250000)
+			i-=250000;
+		else
+			i=0;
+	}
 }
 
 void set_volume(char * message) {
