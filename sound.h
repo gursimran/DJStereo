@@ -151,8 +151,8 @@ void DJPlay(int song1, int song2) {
 	int fx1point=0;
 	int fx2point=0;
 	int fx3point=0;
-	i = 0;
-	m = 0;
+	int i = 0;
+	int m = 0;
 	int j = 0;
 	int x = 0;
 	int startedDJ = 0;
