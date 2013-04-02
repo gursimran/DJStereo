@@ -453,17 +453,17 @@ void fastforward_dj(char * message){
 	sscanf(message, "%s %d %d", temp, &ff1, &ff2);
 	if(ff1 == 1){
 		ff1=0;
-		if(m > 250000)
-			m-=250000;
+		if(m < 2750000)
+			m+=250000;
 		else
-			m=0;
+			m=3000000;
 	}
 	if (ff2==1){
 		ff2=0;
-		if(i >250000)
-			i-=250000;
+		if(i < 2750000)
+			i+=250000;
 		else
-			i=0;
+			i=3000000;
 	}
 }
 
@@ -495,9 +495,9 @@ void read_wav_buffer(char *name, int size) {
 				short dataRead;
 				soundBuffer = (unsigned int *) malloc(sizeof(unsigned int)
 						* buffer_size);
-				int i;
-				for (i = 0; i < buffer_size; i++) {
-					soundBuffer[i] = 0;
+				int q;
+				for (q = 0; q < buffer_size; q++) {
+					soundBuffer[q] = 0;
 				}
 				//song x = getItemAt(songList, a+1);
 				//fileHandle2 = alt_up_sd_card_fopen(x.name, false);
@@ -574,10 +574,8 @@ int abs(int n) {
 }
 void read_FX(char *name, unsigned int size, unsigned char * buffer) {
 	int j = 0;
-	int i = 0;
 	int fileHandle;
 	short dataRead;
-	unsigned char temp, temp2;
 	alt_up_sd_card_dev *device_reference = NULL;
 	device_reference = alt_up_sd_card_open_dev(
 			"/dev/Altera_UP_SD_Card_Avalon_Interface_0");
@@ -611,10 +609,8 @@ void read_FX(char *name, unsigned int size, unsigned char * buffer) {
 }
 void read_wav(char *name, unsigned int size) {
 	int j = 0;
-	int i = 0;
 	int fileHandle;
 	short dataRead;
-	unsigned char temp, temp2;
 	alt_up_sd_card_dev *device_reference = NULL;
 	device_reference = alt_up_sd_card_open_dev(
 			"/dev/Altera_UP_SD_Card_Avalon_Interface_0");
@@ -667,11 +663,8 @@ void read_wav(char *name, unsigned int size) {
 
 void read_wav2(char*name, unsigned int size) {
 	int j = 0;
-	int i = 0;
 	int fileHandle;
 	short dataRead;
-	unsigned char temp, temp2;
-	unsigned int tempSample;
 	alt_up_sd_card_dev *device_reference = NULL;
 	device_reference = alt_up_sd_card_open_dev(
 			"/dev/Altera_UP_SD_Card_Avalon_Interface_0");

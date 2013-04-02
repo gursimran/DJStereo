@@ -118,10 +118,10 @@ song getItemAt (listelement * listpointer, int location){
 	//printf("loc: %d\n",loc);
 	--loc;
 	//printf("\n %d test \n",location);
-	int i;
+	int q;
 	if (listpointer != NULL){
-		for (i=0;i<=loc; i++){
-			//printf("%d\n",i);
+		for (q=0;q<=loc; q++){
+			//printf("%d\n",q);
 			listpointer = listpointer -> link;
 		}
 	}
