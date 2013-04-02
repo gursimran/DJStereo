@@ -14,6 +14,8 @@ char started = 0;
 int k = 0;
 int i = 0;
 int m = 0;
+int itracker=0;
+int mtracker=0;
 alt_up_audio_dev * audio_dev = NULL;
 int a = 0;
 int song1;
@@ -141,6 +143,8 @@ void DJPlay(int song1, int song2) {
 	int size2 = smallsize * 2;
 	int speedcounter1=0;
 	int speedcounter2=0;
+	itracker=0;
+	mtracker=0;
 	while ((i < size2 || m < size1) && stop == 0) {
 		//Pausing reading of file if reading of file catches up to where playing of file is
 		if (startedDJ == 1) {
@@ -171,14 +175,17 @@ void DJPlay(int song1, int song2) {
 		else {
 			if (speed1 == 1) {
 				m = m + 2;
+				mtracker = m;
 			} else if (speed1 == 2) {
 				m = m + 4;
+				m tracker = m;
 			} else if (speed1 == 0) {
 				if(speedcounter1%2==0){
 					m = m + 2;
-					speedcounter++;
+					speedcounter1++;
 				}
 				speedcounter1++;
+				mtracker +=2;
 			}
 		}
 		soundBuffer[j] = temp;
@@ -196,14 +203,17 @@ void DJPlay(int song1, int song2) {
 		else {
 			if (speed2 == 1) {
 				i = i + 2;
+				itracker =i;
 			} else if (speed2 == 2) {
 				i = i + 4;
+				itracker=i;
 			} else if (speed2 == 0) {
 				if(speedcounter2%2==0){
 					i = i + 2;
-					speedcounter2++;
+					speedcounter2=0;
 				}
 				speedcounter2++;
+				itracker+=2;
 			}
 		}
 
@@ -250,8 +260,8 @@ void dj_play_wav() {
 			ALT_UP_AUDIO_RIGHT);
 	alt_up_audio_write_fifo(audio_dev, &(soundBuffer[k]), 100,
 			ALT_UP_AUDIO_LEFT);
-	if ((buffer_size * noTimes) + 100 + k >= m && (buffer_size * noTimes) + 100
-			+ k >= i) {
+	if ((buffer_size * noTimes) + 100 + k >= mtracker && (buffer_size * noTimes) + 100
+			+ k >= itracker) {
 		k = 0;
 		noTimes = 0;
 		alt_up_audio_disable_write_interrupt(audio_dev);
