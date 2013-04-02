@@ -139,6 +139,8 @@ void DJPlay(int song1, int song2) {
 	int startedDJ = 0;
 	int size1 = size * 2;
 	int size2 = smallsize * 2;
+	int speedcounter1=0;
+	int speedcounter2=0;
 	while ((i < size2 || m < size1) && stop == 0) {
 		//Pausing reading of file if reading of file catches up to where playing of file is
 		if (startedDJ == 1) {
@@ -163,15 +165,20 @@ void DJPlay(int song1, int song2) {
 		} else {
 			temp = temp << djvolume1;
 		}
-		if (m > size1)
+		if (m > size1){
 			temp = 0;
+		}
 		else {
 			if (speed1 == 1) {
 				m = m + 2;
 			} else if (speed1 == 2) {
 				m = m + 4;
 			} else if (speed1 == 0) {
-				m = m + 1;
+				if(speedcounter1%2==0){
+					m = m + 2;
+					speedcounter++;
+				}
+				speedcounter1++;
 			}
 		}
 		soundBuffer[j] = temp;
@@ -192,7 +199,11 @@ void DJPlay(int song1, int song2) {
 			} else if (speed2 == 2) {
 				i = i + 4;
 			} else if (speed2 == 0) {
-				i = i + 1;
+				if(speedcounter2%2==0){
+					i = i + 2;
+					speedcounter2++;
+				}
+				speedcounter2++;
 			}
 		}
 
