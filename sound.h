@@ -14,8 +14,6 @@ char started = 0;
 int k = 0;
 int i = 0;
 int m = 0;
-int itracker=0;
-int mtracker=0;
 alt_up_audio_dev * audio_dev = NULL;
 int a = 0;
 int song1;
@@ -143,8 +141,12 @@ void DJPlay(int song1, int song2) {
 	int size2 = smallsize * 2;
 	int speedcounter1=0;
 	int speedcounter2=0;
-	itracker=0;
-	mtracker=0;
+	int speed1count1=0;
+	int speed0count1=0;
+	int speed2count1=0;
+	int speed1count2=0;
+	int speed2count2=0;
+	int speed0count2=0;
 	while ((i < size2 || m < size1) && stop == 0) {
 		//Pausing reading of file if reading of file catches up to where playing of file is
 		if (startedDJ == 1) {
@@ -175,17 +177,17 @@ void DJPlay(int song1, int song2) {
 		else {
 			if (speed1 == 1) {
 				m = m + 2;
-				mtracker = m;
+				speed1count1+=2;
 			} else if (speed1 == 2) {
 				m = m + 4;
-				mtracker = m;
+				speed2count1+=4;
 			} else if (speed1 == 0) {
 				if(speedcounter1%2==0){
 					m = m + 2;
 					speedcounter1++;
 				}
 				speedcounter1++;
-				mtracker +=2;
+				speed0count1++;
 			}
 		}
 		soundBuffer[j] = temp;
@@ -203,18 +205,25 @@ void DJPlay(int song1, int song2) {
 		else {
 			if (speed2 == 1) {
 				i = i + 2;
-				itracker =i;
+				speed1count2+=2;
 			} else if (speed2 == 2) {
 				i = i + 4;
-				itracker=i;
+				speed2count2+=4;
 			} else if (speed2 == 0) {
 				if(speedcounter2%2==0){
 					i = i + 2;
 					speedcounter2=0;
 				}
 				speedcounter2++;
-				itracker+=2;
+				speed0count2++;
 			}
+		}
+		size = size1/2 - m + (speed1count1 / 2) +(speed2count1 / 4) +speed0count1;
+		smallsize = size2/2 - i + (speed1count2 / 2) + (speed2count2 / 4) + speed0count2;
+		if (smallsize > size){
+			int tempsize = size;
+			size = smallsize;
+			smallsize = tempsize;
 		}
 
 		soundBuffer[j] = soundBuffer[j] + (temp);
@@ -261,8 +270,7 @@ void dj_play_wav() {
 	alt_up_audio_write_fifo(audio_dev, &(soundBuffer[k]), 100,
 			ALT_UP_AUDIO_LEFT);
 
-	if ((buffer_size * noTimes) + 100 + k >= mtracker/2 && (buffer_size * noTimes) + 100
-			+ k >= itracker/2) {
+	if ((buffer_size * noTimes) + 100 + k >= size) {
 		k = 0;
 		noTimes = 0;
 		alt_up_audio_disable_write_interrupt(audio_dev);
