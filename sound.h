@@ -178,7 +178,7 @@ void DJPlay(int song1, int song2) {
 				mtracker = m;
 			} else if (speed1 == 2) {
 				m = m + 4;
-				m tracker = m;
+				mtracker = m;
 			} else if (speed1 == 0) {
 				if(speedcounter1%2==0){
 					m = m + 2;
@@ -260,12 +260,14 @@ void dj_play_wav() {
 			ALT_UP_AUDIO_RIGHT);
 	alt_up_audio_write_fifo(audio_dev, &(soundBuffer[k]), 100,
 			ALT_UP_AUDIO_LEFT);
+
 	if ((buffer_size * noTimes) + 100 + k >= mtracker && (buffer_size * noTimes) + 100
 			+ k >= itracker) {
 		k = 0;
 		noTimes = 0;
 		alt_up_audio_disable_write_interrupt(audio_dev);
 		alt_up_audio_reset_audio_core(audio_dev);
+		stop = 1;
 		free(soundBuffer);
 		free(soundBuffer1DJ);
 		free(soundBuffer2DJ);
