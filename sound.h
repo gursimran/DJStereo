@@ -122,7 +122,7 @@ void DJPlay(int song1, int song2) {
 	//unsigned char * sound;
 	//usleep(1000000);
 	started = 0;
-	y = 0;
+	//y = 0;
 	soundBuffer1DJ = (unsigned char *) malloc(sizeof(unsigned char) * size);
 	soundBuffer2DJ
 			= (unsigned char *) malloc(sizeof(unsigned char) * smallsize);
@@ -250,7 +250,7 @@ void DJPlay(int song1, int song2) {
 		if(FX1==1 && fx1point < fx1.Size){
 			temp= (FX1Buffer[fx1point + 1] << 8) | FX1Buffer[fx1point];
 			fx1point+=2;
-			soundBuffer[j] = soundBuffer[j] + (temp);
+			soundBuffer[j] = soundBuffer[j] + (temp<<8);
 		}else{
 			FX1=0;
 			fx1point=0;
@@ -258,7 +258,7 @@ void DJPlay(int song1, int song2) {
 		if(FX2==1 && fx2point < fx2.Size){
 			temp= (FX2Buffer[fx2point + 1] << 8) | FX2Buffer[fx2point];
 			fx2point+=2;
-			soundBuffer[j] = soundBuffer[j] + (temp);
+			soundBuffer[j] = soundBuffer[j] + (temp<<8);
 
 		}else{
 			FX2=0;
@@ -267,7 +267,7 @@ void DJPlay(int song1, int song2) {
 		if(FX3==1 && fx3point < fx3.Size){
 			temp= (FX3Buffer[fx1point + 1] << 8) | FX3Buffer[fx1point];
 			fx3point+=2;
-			soundBuffer[j] = soundBuffer[j] + (temp);
+			soundBuffer[j] = soundBuffer[j] + (temp<<8);
 
 		}else{
 			FX3=0;
