@@ -50,18 +50,15 @@ void ReadData(void * context, unsigned int irq_id) {
 		} else if (command[0] == 's') {
 			stop_sound();
 		} else if (command[0] == 'l') {
-			if (started == 1){
-				pause_sound();
-			}
+			stop_sound();
+			started=0;
 			send_num_songs = 3;
 			sent_songs = 0;
+			readSongsFromSDCard();
 			song_string(songList);
 			sendData( songString);
 			free(songString);
 			startedSendingList = 1;
-			if (started == 1){
-				resume_sound();
-			}
 		} else if (command[0] == 'b') {
 			previous_sound();
 		} else if (command[0] == 'n') {

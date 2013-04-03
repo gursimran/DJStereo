@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <altera_up_sd_card_avalon_interface.h>
 
+alt_up_sd_card_dev *device_reference;
 listelement *songList;
 listelement *FXList;
 unsigned char * data;
@@ -106,7 +107,6 @@ void readSongsFromSDCard() {
 	num_songs = 0;
 	num_FX = 0;
 	char songFileName[20];
-	alt_up_sd_card_dev *device_reference = NULL;
 	device_reference = alt_up_sd_card_open_dev(
 			"/dev/Altera_UP_SD_Card_Avalon_Interface_0");
 
