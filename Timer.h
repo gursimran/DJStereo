@@ -93,6 +93,8 @@ void ReadData(void * context, unsigned int irq_id) {
 			rewind_dj(command);
 		} else if (command[0] == 'y'){
 			fastforward_dj(command);
+		} else if (command[0] == 'h'){
+			record_song();
 		}
 
 		printf("\n");
