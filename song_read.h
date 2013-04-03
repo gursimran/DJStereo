@@ -102,62 +102,11 @@ void getSongName(char * name, char * songname, char * songartist) {
 
 	alt_up_sd_card_fclose(fileHandle);
 }
-void readsongFXFromSDCard(){
-	num_FX = 0;
-	char songFileName[20];
-	alt_up_sd_card_dev *device_reference = NULL;
-	device_reference = alt_up_sd_card_open_dev(
-			"/dev/Altera_UP_SD_Card_Avalon_Interface_0");
 
-	if (device_reference == NULL) {
-		printf("Could not read from the SDcard.\n");
-		return 0;
-	} else {
-		if (!alt_up_sd_card_is_Present()) {
-			printf("The SDcard is not present!\n");
-			return 0;
-		}
-
-		else {
-			if (!alt_up_sd_card_is_FAT16()) {
-				printf(
-						"The SDcard is not formatted to be FAT16 and could not be read.\n");
-				return 0;
-			}
-		}
-	}
-
-	if (alt_up_sd_card_find_first(".", songFileName) != 0) {
-		printf("Could not find any files in the SD card");
-		return 0;
-	} else {
-		if (strstr(songFileName, "WAV") != NULL&& strstr(songFileName, "FX")!=NULL) {
-			song x;
-			x.ID = num_FX;
-			x.Size = getSizeOfSong(songFileName);
-			x.LENGTH = getLengthOfSong(x.Size);
-			strcpy(x.realname, "dummy");
-			strcpy(x.artist, "dummy");
-			strcpy(x.name, songFileName);
-			FXList = AddItem2(FXList, x);
-		}
-		while (alt_up_sd_card_find_next(songFileName) == 0) {
-			if (strstr(songFileName, "WAV") != NULL && strstr(songFileName, "FX")!=NULL) {
-				song x;
-				x.ID = num_FX;
-				x.Size = getSizeOfSong(songFileName);
-				x.LENGTH = getLengthOfSong(x.Size);
-				strcpy(x.realname, "dummy");
-				strcpy(x.artist, "dummy");
-				strcpy(x.name, songFileName);
-				FXList = AddItem2(FXList, x);
-			}
-		}
-	}
-}
 
 void readSongsFromSDCard() {
 	num_songs = 0;
+	num_FX=0;
 	char songFileName[20];
 	alt_up_sd_card_dev *device_reference = NULL;
 	device_reference = alt_up_sd_card_open_dev(
@@ -185,30 +134,45 @@ void readSongsFromSDCard() {
 		printf("Could not find any files in the SD card");
 		return 0;
 	} else {
-		if (strstr(songFileName, "WAV") != NULL&& strstr(songFileName, "FX")==NULL) {
+		if (strstr(songFileName, "WAV") != NULL) {
 			song x;
-			x.ID = num_songs;
 			x.Size = getSizeOfSong(songFileName);
 			x.LENGTH = getLengthOfSong(x.Size);
-
-			getSongName(songFileName,x.realname, x.artist);
-			free(data);
-
 			strcpy(x.name, songFileName);
-			songList = AddItem(songList, x);
-		}
-		while (alt_up_sd_card_find_next(songFileName) == 0) {
-			if (strstr(songFileName, "WAV") != NULL && strstr(songFileName, "FX")==NULL) {
-				song x;
-				x.ID = num_songs;
-				x.Size = getSizeOfSong(songFileName);
-				x.LENGTH = getLengthOfSong(x.Size);
 
+			if ( strstr(songFileName, "FX")==NULL){
+				x.ID = num_songs;
 				getSongName(songFileName,x.realname, x.artist);
 				free(data);
+				songList = AddItem(songList, x,0);
+			}
+			else{
+				x.ID=num_FX;
+				strcpy(x.realname, "dummy");
+				strcpy(x.artist, "dummy");
+				FXList = AddItem(FXList, x,1);
+			}
 
+		}
+		while (alt_up_sd_card_find_next(songFileName) == 0) {
+			if (strstr(songFileName, "WAV") != NULL) {
+				song x;
+				x.Size = getSizeOfSong(songFileName);
+				x.LENGTH = getLengthOfSong(x.Size);
 				strcpy(x.name, songFileName);
-				songList = AddItem(songList, x);
+
+				if ( strstr(songFileName, "FX")==NULL){
+					x.ID = num_songs;
+					getSongName(songFileName,x.realname, x.artist);
+					free(data);
+					songList = AddItem(songList, x,0);
+				}
+				else{
+					x.ID=num_FX;
+					strcpy(x.realname, "dummy");
+					strcpy(x.artist, "dummy");
+					FXList = AddItem(FXList, x,1);
+				}
 			}
 		}
 	}

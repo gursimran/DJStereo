@@ -31,9 +31,7 @@ int reach1000;
 char readMore = 0;
 void readWavFromSDCARD(char *name, unsigned char *levelBricksToDraw);
 void configure_audio();
-void read_wav(char *name, unsigned int size);
-void read_FX(char *name, unsigned int size, unsigned char * buffer);
-void read_wav2(char*name, unsigned int size);
+void read_wav(char *name, unsigned int size, unsigned char* soundbuff);
 void play_wav();
 void dj_play_wav();
 void read_wav_buffer(char *name, int size);
@@ -50,6 +48,8 @@ int FX3=0;
 int buffer_size = 10000;
 
 int size = 0;
+int smallsize=0;
+
 
 static void init_button_pio() {
 	alt_irq_register(AUDIO_0_IRQ, NULL, play_wav);
@@ -97,7 +97,6 @@ void DJPlay(int song1, int song2) {
 	song song22 = getItemAt(songList, song2);
 	song smallsong;
 	song bigsong;
-	int smallsize;
 
 	if (song11.Size > song22.Size) {
 		size = song11.Size;
@@ -127,6 +126,7 @@ void DJPlay(int song1, int song2) {
 	soundBuffer2DJ
 			= (unsigned char *) malloc(sizeof(unsigned char) * smallsize);
 	soundBuffer = (unsigned int *) malloc(sizeof(unsigned int) * buffer_size);
+	//3000000 bytes (3MB) equates to about 40 seconds of song
 
 	song fx1 = getItemAt(FXList,0);
 	song fx2 = getItemAt(FXList, 1);
@@ -134,13 +134,14 @@ void DJPlay(int song1, int song2) {
 	FX1Buffer = (unsigned char *) malloc(sizeof(unsigned char)*fx1.Size);
 	FX2Buffer = (unsigned char *) malloc(sizeof(unsigned char)*fx2.Size);
 	FX3Buffer = (unsigned char *) malloc(sizeof(unsigned char)*fx3.Size);
-	read_FX(fx1.name,fx1.Size,FX1Buffer );
-	read_FX(fx2.name,fx2.Size,FX2Buffer );
-	read_FX(fx3.name,fx3.Size,FX3Buffer );
+	read_wav(fx1.name,fx1.Size,FX1Buffer );
+	read_wav(fx2.name,fx2.Size,FX2Buffer );
+	read_wav(fx3.name,fx3.Size,FX3Buffer );
 
-	read_wav(bigsong.name, size);
-	read_wav2(smallsong.name, smallsize);
+	read_wav(bigsong.name, size, soundBuffer1DJ);
+	read_wav(smallsong.name, smallsize, soundBuffer2DJ);
 	size = size / 2;
+	smallsize = smallsize/2;
 
 	//whenToStart gets the smaller of buffer_size or size
 	int whenToStart = buffer_size;
@@ -151,8 +152,8 @@ void DJPlay(int song1, int song2) {
 	int fx1point=0;
 	int fx2point=0;
 	int fx3point=0;
-	int i = 0;
-	int m = 0;
+	i = 0;
+	m = 0;
 	int j = 0;
 	int x = 0;
 	int startedDJ = 0;
@@ -160,12 +161,6 @@ void DJPlay(int song1, int song2) {
 	int size2 = smallsize * 2;
 	int speedcounter1=0;
 	int speedcounter2=0;
-	int speed1count1=0;
-	int speed0count1=0;
-	int speed2count1=0;
-	int speed1count2=0;
-	int speed2count2=0;
-	int speed0count2=0;
 	while ((i < size2 || m < size1) && stop == 0) {
 		//Pausing reading of file if reading of file catches up to where playing of file is
 		if (startedDJ == 1) {
@@ -173,8 +168,8 @@ void DJPlay(int song1, int song2) {
 				x++;
 				if (x == 10000000) {
 
-					printf("help, im stuck, with value of y: %d and k: %d\n",
-							j, k);
+					printf("help, im stuck, with value of i: %d and m: %d\n",
+							i, m);
 					alt_up_audio_reset_audio_core(audio_dev);
 					//k += 100;
 					break;
@@ -190,23 +185,23 @@ void DJPlay(int song1, int song2) {
 		} else {
 			temp = temp << djvolume1;
 		}
-		if (m > size1){
+		if (m >= size1){
 			temp = 0;
+			m=size1+1;
 		}
 		else {
 			if (speed1 == 1) {
 				m = m + 2;
-				speed1count1+=2;
 			} else if (speed1 == 2) {
 				m = m + 4;
-				speed2count1+=4;
+				size--;
 			} else if (speed1 == 0) {
 				if(speedcounter1%2==0){
 					m = m + 2;
 					speedcounter1++;
 				}
 				speedcounter1++;
-				speed0count1++;
+				size++;
 			}
 		}
 		soundBuffer[j] = temp;
@@ -219,31 +214,26 @@ void DJPlay(int song1, int song2) {
 		} else {
 			temp = temp << djvolume2;
 		}
-		if (i > size2)
+		if (i >= size2){
 			temp = 0;
+			i=size2+1;
+		}
 		else {
 			if (speed2 == 1) {
 				i = i + 2;
-				speed1count2+=2;
 			} else if (speed2 == 2) {
 				i = i + 4;
-				speed2count2+=4;
+				smallsize--;
 			} else if (speed2 == 0) {
 				if(speedcounter2%2==0){
 					i = i + 2;
 					speedcounter2=0;
 				}
 				speedcounter2++;
-				speed0count2++;
+				smallsize++;
 			}
 		}
-		size = size1/2 - m + (speed1count1 / 2) +(speed2count1 / 4) +speed0count1;
-		smallsize = size2/2 - i + (speed1count2 / 2) + (speed2count2 / 4) + speed0count2;
-		if (smallsize > size){
-			int tempsize = size;
-			size = smallsize;
-			smallsize = tempsize;
-		}
+
 
 		soundBuffer[j] = soundBuffer[j] + (temp);
 
@@ -283,6 +273,9 @@ void DJPlay(int song1, int song2) {
 			startedDJ = 1;
 		}
 	}
+	size = (buffer_size * noTimes) + 100 + k;
+	smallsize = (buffer_size * noTimes) + 100 + k;
+
 }
 
 void play_wav() {
@@ -318,7 +311,7 @@ void dj_play_wav() {
 	alt_up_audio_write_fifo(audio_dev, &(soundBuffer[k]), 100,
 			ALT_UP_AUDIO_LEFT);
 
-	if ((buffer_size * noTimes) + 100 + k >= size) {
+	if ((buffer_size * noTimes) + 100 + k >= size && (buffer_size * noTimes) + 100 + k >= smallsize) {
 		k = 0;
 		noTimes = 0;
 		alt_up_audio_disable_write_interrupt(audio_dev);
@@ -348,6 +341,11 @@ void stop_sound() {
 	pause = 0;
 	stop = 1;
 	free(soundBuffer);
+	free(soundBuffer1DJ);
+	free(soundBuffer2DJ);
+	free(FX1Buffer);
+	free(FX2Buffer);
+	free(FX3Buffer);
 }
 
 void pause_sound() {
@@ -424,46 +422,63 @@ void set_djspeed(char * message) {
 }
 
 void rewind_dj(char * message){
-	char temp[20];
+	char temp[5];
 	int rewind1;
 	int rewind2;
 
 	sscanf(message, "%s %d %d", temp, &rewind1, &rewind2);
+
 	if(rewind1 == 1){
 		rewind1=0;
-		if(m > 250000)
+		if(m > 250000){
 			m-=250000;
-		else
+			size+=250000;
+		}
+		else{
+			size+=m;
 			m=0;
+		}
 	}
 	if (rewind2==1){
 		rewind2=0;
-		if(i >250000)
+		if(i >250000){
 			i-=250000;
-		else
+			smallsize+=250000;
+		}
+		else{
+			smallsize+=i;
 			i=0;
+		}
 	}
 }
 
 void fastforward_dj(char * message){
-	char temp[20];
+	char temp[5];
 	int ff1;
 	int ff2;
 
 	sscanf(message, "%s %d %d", temp, &ff1, &ff2);
 	if(ff1 == 1){
 		ff1=0;
-		if(m > 250000)
-			m-=250000;
-		else
-			m=0;
+		if(m < 2750000){
+			m+=250000;
+			size-=250000;
+		}
+		else{
+			size-=(3000000-m);
+			m=3000000;
+		}
 	}
 	if (ff2==1){
 		ff2=0;
-		if(i >250000)
-			i-=250000;
-		else
-			i=0;
+		if(i < 2750000){
+			i+=250000;
+			smallsize-=250000;
+		}
+		else{
+			smallsize-=(3000000-i);
+			i=3000000;
+		}
 	}
 }
 
@@ -495,9 +510,9 @@ void read_wav_buffer(char *name, int size) {
 				short dataRead;
 				soundBuffer = (unsigned int *) malloc(sizeof(unsigned int)
 						* buffer_size);
-				int i;
-				for (i = 0; i < buffer_size; i++) {
-					soundBuffer[i] = 0;
+				int q;
+				for (q = 0; q < buffer_size; q++) {
+					soundBuffer[q] = 0;
 				}
 				//song x = getItemAt(songList, a+1);
 				//fileHandle2 = alt_up_sd_card_fopen(x.name, false);
@@ -572,49 +587,12 @@ int abs(int n) {
 	const int ret[2] = { n, -n };
 	return ret[n < 0];
 }
-void read_FX(char *name, unsigned int size, unsigned char * buffer) {
+
+
+void read_wav(char*name, unsigned int size, unsigned char * soundbuff) {
 	int j = 0;
-	int i = 0;
 	int fileHandle;
 	short dataRead;
-	unsigned char temp, temp2;
-	alt_up_sd_card_dev *device_reference = NULL;
-	device_reference = alt_up_sd_card_open_dev(
-			"/dev/Altera_UP_SD_Card_Avalon_Interface_0");
-	if (device_reference == NULL) {
-		printf("Could not read from the SDcard.\n");
-	} else {
-		if (!alt_up_sd_card_is_Present()) {
-			printf("The SDcard is not present!\n");
-		}
-
-		else {
-			if (!alt_up_sd_card_is_FAT16()) {
-				printf(
-						"The SDcard is not formatted to be FAT16 and could not be read.\n");
-			} else {
-				fileHandle = alt_up_sd_card_fopen(name, false);
-
-				// Get first byte of file
-				dataRead = alt_up_sd_card_read(fileHandle);
-
-				// Keep reading till eof
-				while (dataRead > -1) {
-					buffer[j] = dataRead;
-					dataRead = alt_up_sd_card_read(fileHandle);
-					j++;
-				}
-				alt_up_sd_card_fclose(fileHandle);
-			}
-		}
-	}
-}
-void read_wav(char *name, unsigned int size) {
-	int j = 0;
-	int i = 0;
-	int fileHandle;
-	short dataRead;
-	unsigned char temp, temp2;
 	alt_up_sd_card_dev *device_reference = NULL;
 	device_reference = alt_up_sd_card_open_dev(
 			"/dev/Altera_UP_SD_Card_Avalon_Interface_0");
@@ -637,64 +615,7 @@ void read_wav(char *name, unsigned int size) {
 
 				// Keep reading till eof
 				while (dataRead > -1 && j < 3000000) {
-					soundBuffer1DJ[j] = dataRead;
-					dataRead = alt_up_sd_card_read(fileHandle);
-					j++;
-				}
-
-				printf("number of reads from file: %d, %s\n", j, name);
-
-				alt_up_sd_card_fclose(fileHandle);
-			}
-		}
-	}
-	//	readWavFromSDCARD(name, soundBuffer);
-	//
-	//	unsigned int * temp_array;
-	//	temp_array = (unsigned int *) malloc((size / 2) * sizeof(unsigned int));
-	//	int x;
-	//	int y = 0;
-	//	for (x = 0; x < size; x += 2) {
-	//		unsigned int sample = (levelBricksToDraw[x + 1] << 8 | levelBricksToDraw[x]) << 8; //original
-	//		temp_array[y] = sample;
-	//		if(y%1000==0)
-	//			printf("%d",y);
-	//		y++;
-	//	}
-	//	free(levelBricksToDraw);
-	//	return temp_array;
-}
-
-void read_wav2(char*name, unsigned int size) {
-	int j = 0;
-	int i = 0;
-	int fileHandle;
-	short dataRead;
-	unsigned char temp, temp2;
-	unsigned int tempSample;
-	alt_up_sd_card_dev *device_reference = NULL;
-	device_reference = alt_up_sd_card_open_dev(
-			"/dev/Altera_UP_SD_Card_Avalon_Interface_0");
-	if (device_reference == NULL) {
-		printf("Could not read from the SDcard.\n");
-	} else {
-		if (!alt_up_sd_card_is_Present()) {
-			printf("The SDcard is not present!\n");
-		}
-
-		else {
-			if (!alt_up_sd_card_is_FAT16()) {
-				printf(
-						"The SDcard is not formatted to be FAT16 and could not be read.\n");
-			} else {
-				fileHandle = alt_up_sd_card_fopen(name, false);
-
-				// Get first byte of file
-				dataRead = alt_up_sd_card_read(fileHandle);
-
-				// Keep reading till eof
-				while (dataRead > -1 && j < 3000000) {
-					soundBuffer2DJ[j] = dataRead;
+					soundbuff[j] = dataRead;
 					dataRead = alt_up_sd_card_read(fileHandle);
 					j++;
 				}

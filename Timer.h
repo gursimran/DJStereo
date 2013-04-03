@@ -10,14 +10,14 @@ int s = 0;
 
 void sendData(char * message) {
 	int length = strlen(message);
-	int i;
+	int q;
 	alt_up_rs232_dev* uart = alt_up_rs232_open_dev(RS232_0_NAME);
 	//	while (alt_up_rs232_get_used_space_in_read_FIFO(uart)) {
 	//		alt_up_rs232_read_data(uart, &data, &parity);
 	//	}
 	//	alt_up_rs232_write_data(uart, 'h');
-	for (i = 0; i < length; i++) {
-		alt_up_rs232_write_data(uart, message[i]);
+	for (q = 0; q < length; q++) {
+		alt_up_rs232_write_data(uart, message[q]);
 	}
 }
 
@@ -30,12 +30,12 @@ void ReadData(void * context, unsigned int irq_id) {
 		alt_up_rs232_read_data(uart, &data, &parity);
 		int num_to_receive = (int) data;
 		char * command = (char *) malloc(sizeof(char) * (num_to_receive + 1));
-		int i;
-		for (i = 0; i < num_to_receive; i++) {
+		int q;
+		for (q = 0; q < num_to_receive; q++) {
 			while (alt_up_rs232_get_used_space_in_read_FIFO(uart) == 0)
 				;
 			alt_up_rs232_read_data(uart, &data, &parity);
-			command[i] = data;
+			command[q] = data;
 			printf("%c", data);
 		}
 		command[num_to_receive] = '\0';
@@ -90,9 +90,9 @@ void ReadData(void * context, unsigned int irq_id) {
 			//play FX3
 			FX3=1;
 		} else if (command[0]=='w'){
-			//rewind_dj(command);
+			rewind_dj(command);
 		} else if (command[0] == 'y'){
-			//fastforward_dj(command);
+			fastforward_dj(command);
 		}
 
 		printf("\n");
