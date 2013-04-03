@@ -30,25 +30,6 @@ int main(){
 	readSongsFromSDCard();
 
 	//print all song names
-	int x;
-	for(x=0; x<num_songs; x++){
-		song a = getItemAt(songList, x);
-		printf("%d\n",a.ID);
-		printf("%s\n", a.name);
-		printf("%d\n", a.LENGTH);
-		printf("%d\n", a.Size);
-		printf("%s\n", a.realname);
-		printf("%s\n", a.artist);
-	}
-	for(x=0; x<num_FX; x++){
-		song a = getItemAt(FXList, x);
-		printf("%d\n",a.ID);
-		printf("%s\n", a.name);
-		printf("%d\n", a.LENGTH);
-		printf("%d\n", a.Size);
-		printf("%s\n", a.realname);
-		printf("%s\n", a.artist);
-	}
 
 	//init timer
 	init_Timer();
