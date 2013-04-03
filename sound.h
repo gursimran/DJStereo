@@ -280,11 +280,11 @@ void DJPlay(int song1, int song2) {
 			alt_up_sd_card_write(record_fileHandle,byteToRecord);
 			byteToRecord=(soundBuffer[j]>>16)&0xff;
 			alt_up_sd_card_write(record_fileHandle,byteToRecord);
-		}else if(record ==1){
+		}else if(record ==1 && record_point>=960087){
 			alt_up_sd_card_fclose(record_fileHandle);
-
-		}
-		else{
+			record = 0;
+			record_point=0;
+		}else{
 			record_point=0;
 			record =0;
 		}
