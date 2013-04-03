@@ -21,6 +21,7 @@ int song2;
 int y = 0;
 char sendingFile = 0;
 int fileSendPosition = 0;
+char stillComputingDataToBeSent = 0;
 unsigned int * soundBuffer;
 unsigned char * soundBuffer1DJ;
 unsigned char * soundBuffer2DJ;
@@ -401,10 +402,10 @@ void dj_play_wav() {
 
 void sendFile(){
 	int next100samples;
-	char nextCheck[100];
-	if(fileSendPosition<960087){
+	unsigned char nextCheck[100];
+	if(fileSendPosition<960088){
 		for (next100samples = 0; next100samples < 100; next100samples++){
-			nextCheck[i] = recordBuffer[i+fileSendPosition];
+			nextCheck[next100samples] = recordBuffer[next100samples+fileSendPosition];
 		}
 		fileSendPosition += 100;
 	}
@@ -414,9 +415,12 @@ void sendFile(){
 		nextCheck[2] = 'd';
 		nextCheck[3] = '\0';
 		sendingFile = 0;
+		fileSendPosition = 0;
 		free(recordBuffer);
 	}
 	sendData(nextCheck);
+	stillComputingDataToBeSent = 0;
+
 }
 void record_song(){
 	alt_up_sd_card_dev *device_reference = NULL;
