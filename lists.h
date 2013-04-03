@@ -4,15 +4,15 @@ typedef struct {
     struct listelement *link;
 }listelement;
 
-int send_num_songs = 3;
-int sent_songs = 0;
+volatile int send_num_songs = 3;
+volatile int sent_songs = 0;
 //ADD, REMOVE, GET TO ITEM FUNCTIONS FOR QUEUES
 listelement * AddItem (listelement * listpointer, song data, int flag);
 listelement * RemoveItem (listelement * listpointer);
 song getItem (listelement * listpointer);
-int num_songs = 0;
-int num_FX = 0;
-char * songString;
+volatile int num_songs = 0;
+volatile int num_FX = 0;
+volatile char * songString;
 
 //ADDITEM TO QUEUE
 listelement * AddItem (listelement * listpointer, song data, int flag) {

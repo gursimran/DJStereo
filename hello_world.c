@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <system.h>
-char playSong = 0;
-char djplaysong=0;
-char stop_currently_playing = 0;
-char pause = 0;char startedSendingList = 0;
+volatile char playSong = 0;
+volatile char djplaysong=0;
+volatile char stop_currently_playing = 0;
+volatile char pause = 0;char startedSendingList = 0;
 #include "altera_up_sd_card_avalon_interface.h"
 #include <stdio.h>
 #include "altera_up_avalon_rs232.h"
