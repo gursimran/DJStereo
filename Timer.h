@@ -96,10 +96,10 @@ void ReadData(void * context, unsigned int irq_id) {
 		} else if (command[0] == 'h'){
 			record_song();
 		}else if (command[0] == 'u'){
-			if (sendingFile == 1){
+			if (sendingFile == 1 && stillComputingDataToBeSent == 0){
+				stillComputingDataToBeSent = 1;
 				sendFile();
 			}
-			printf("done send\n");
 		}
 
 		printf("\n");
