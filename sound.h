@@ -50,7 +50,12 @@ void read_wav_buffer(char *name, int size);
  int record_fileHandle;
  int record_done;
  int buffer_size = 10000;
- int rwff=0;
+ int rwff1=0;
+ int rwff2=0;
+ int song1edit=0;
+ int song2edit=0;
+int fx1point = 0;
+
 
 
  int size = 0;
@@ -161,7 +166,6 @@ void DJPlay(int song1, int song2) {
 		whenToStart = size;
 	}
 	k = 0;
-	int fx1point = 0;
 	int fx2point = 0;
 	i = 0;
 	m = 0;
@@ -203,7 +207,7 @@ void DJPlay(int song1, int song2) {
 		if (m >= size1) {
 			temp = 0;
 			m = size1 + 1;
-		} else if(rwff==1){
+		} else if(rwff1==1){
 			temp=0;
 		}else {
 			if (speed1 == 1) {
@@ -233,7 +237,7 @@ void DJPlay(int song1, int song2) {
 		if (i >= size2) {
 			temp = 0;
 			i = size2 + 1;
-		}else if(rwff==2){
+		}else if(rwff2==1){
 			temp=0;
 		}else {
 			if (speed2 == 1) {
@@ -258,7 +262,10 @@ void DJPlay(int song1, int song2) {
 			fx1point += 2;
 			soundBuffer[j] = soundBuffer[j] + (temp << 8);
 		}else {
-			rwff=0;
+			rwff1=0;
+			rwff2=0;
+			song1edit=0;
+			song2edit=0;
 			FX1 = 0;
 			fx1point = 0;
 		}
@@ -518,8 +525,10 @@ void rewind_dj(char * message) {
 			size += m/2;
 			m = 0;
 		}
-		rwff=1;
-		size+=17429;
+		rwff1=1;
+		if(song1edit==0)
+			size+=17429-(fx1point/2);
+		song1edit=1;
 	}
 	if (rewind2 == 1) {
 		rewind2 = 0;
@@ -530,8 +539,10 @@ void rewind_dj(char * message) {
 			smallsize += i/2;
 			i = 0;
 		}
-		rwff=2;
-		smallsize+=17429;
+		rwff2=1;
+		if(song2edit==0)
+			smallsize+=17429-(fx1point/2);
+		song2edit=1;
 
 	}
 }
@@ -551,8 +562,10 @@ void fastforward_dj(char * message) {
 			size -= (3000000 - m)/2;
 			m = 3000000;
 		}
-		rwff=1;
-		size+=17429;
+		rwff1=1;
+		if(song1edit==0)
+			size+=17429-(fx1point/2);
+		song1edit=1;
 
 	}
 	if (ff2 == 1) {
@@ -564,9 +577,10 @@ void fastforward_dj(char * message) {
 			smallsize -= (3000000 - i)/2;
 			i = 3000000;
 		}
-		rwff=2;
-		smallsize+=17429;
-
+		rwff2=1;
+		if(song2edit==0)
+			smallsize+=17429-(fx1point/2);
+		song2edit=1;
 	}
 }
 
