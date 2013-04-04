@@ -508,23 +508,26 @@ void rewind_dj(char * message) {
 		rewind1 = 0;
 		if (m > 250000) {
 			m -= 250000;
-			size += 250000;
+			size += 125000;
 		} else {
-			size += m;
+			size += m/2;
 			m = 0;
 		}
 		rwff=1;
+		size+=17429;
 	}
 	if (rewind2 == 1) {
 		rewind2 = 0;
 		if (i > 250000) {
 			i -= 250000;
-			smallsize += 250000;
+			smallsize += 125000;
 		} else {
-			smallsize += i;
+			smallsize += i/2;
 			i = 0;
 		}
 		rwff=2;
+		size+=17429;
+
 	}
 }
 
@@ -538,23 +541,27 @@ void fastforward_dj(char * message) {
 		ff1 = 0;
 		if (m < 2750000) {
 			m += 250000;
-			size -= 250000;
+			size -= 125000;
 		} else {
-			size -= (3000000 - m);
+			size -= (3000000 - m)/2;
 			m = 3000000;
 		}
 		rwff=1;
+		size+=17429;
+
 	}
 	if (ff2 == 1) {
 		ff2 = 0;
 		if (i < 2750000) {
 			i += 250000;
-			smallsize -= 250000;
+			smallsize -= 125000;
 		} else {
-			smallsize -= (3000000 - i);
+			smallsize -= (3000000 - i)/2;
 			i = 3000000;
 		}
 		rwff=2;
+		size+=17429;
+
 	}
 }
 
