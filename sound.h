@@ -396,8 +396,8 @@ void dj_play_wav() {
 				alt_up_sd_card_write(record_fileHandle, recordBuffer[x]);
 			alt_up_sd_card_fclose(record_fileHandle);
 			printf("done writing to sd card\n");
-			free(recordBuffer);
 		}
+		free(recordBuffer);
 
 		mute = 0;
 		playing = 0;
