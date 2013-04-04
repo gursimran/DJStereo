@@ -8,53 +8,58 @@
 #include "assert.h"
 #include "sys/alt_irq.h"
 
- char mute = 0;
- char playing = 0;
- char started = 0;
- int k = 0;
- int i = 0;
- int m = 0;
- alt_up_audio_dev * audio_dev = NULL;
- int a = 0;
- int song1;
- int song2;
- int y = 0;
- char sendingFile = 0;
- int fileSendPosition = 0;
- char stillComputingDataToBeSent = 0;
- unsigned int * soundBuffer;
- unsigned char * soundBuffer1DJ;
- unsigned char * soundBuffer2DJ;
- unsigned char * FX1Buffer;
- unsigned char * FX2Buffer;
- unsigned char * recordBuffer;
- int record = 0;
+volatile char mute = 0;
+volatile  char playing = 0;
+volatile  char started = 0;
+volatile  int k = 0;
+volatile  int i = 0;
+volatile  int m = 0;
+volatile  alt_up_audio_dev * audio_dev = NULL;
+volatile  int a = 0;
+volatile  int song1;
+volatile  int song2;
+volatile  int y = 0;
+volatile  char sendingFile = 0;
+volatile  int fileSendPosition = 0;
+volatile  char stillComputingDataToBeSent = 0;
+volatile  unsigned int * soundBuffer;
+volatile  unsigned char * soundBuffer1DJ;
+volatile  unsigned char * soundBuffer2DJ;
+volatile  unsigned char * FX1Buffer;
+volatile  unsigned char * FX2Buffer;
+volatile  unsigned char * recordBuffer;
+volatile  int record = 0;
 
- int noTimes = 0;
- int reach1000;
- char readMore = 0;
+volatile  int noTimes = 0;
+volatile  int reach1000;
+volatile  char readMore = 0;
 void readWavFromSDCARD(char *name, unsigned char *levelBricksToDraw);
-void configure_audio();
-void read_wav(char *name, unsigned int size, unsigned char* soundbuff);
-void play_wav();
-void dj_play_wav();
-void read_wav_buffer(char *name, int size);
- int volume = 5;
- int djvolume1 = 7;
- int djvolume2 = 7;
- int speed1 = 1;
- int speed2 = 1;
- int stop = 1;
- int FX1 = 0;
- int FX2 = 0;
- int record_fileHandle;
- int record_done;
- int buffer_size = 10000;
- int rwff=0;
+ void configure_audio();
+ void read_wav(char *name, unsigned int size, unsigned char* soundbuff);
+ void play_wav();
+ void dj_play_wav();
+ void read_wav_buffer(char *name, int size);
+volatile  int volume = 5;
+volatile  int djvolume1 = 7;
+volatile  int djvolume2 = 7;
+volatile  int speed1 = 1;
+volatile int speed2 = 1;
+ volatile int stop = 1;
+ volatile int FX1 = 0;
+ volatile  int FX2 = 0;
+ volatile int record_fileHandle;
+ volatile int record_done;
+ volatile int buffer_size = 10000;
+ volatile int rwff1=0;
+ volatile  int rwff2=0;
+ volatile  int fx1point = 0;
+ volatile  char song1edit=0;
+ volatile  char song2edit=0;
 
 
- int size = 0;
- int smallsize = 0;
+
+ volatile  int size = 0;
+ volatile  int smallsize = 0;
 
 static void init_button_pio() {
 	alt_irq_register(AUDIO_0_IRQ, NULL, play_wav);
@@ -161,7 +166,6 @@ void DJPlay(int song1, int song2) {
 		whenToStart = size;
 	}
 	k = 0;
-	int fx1point = 0;
 	int fx2point = 0;
 	i = 0;
 	m = 0;
@@ -203,7 +207,7 @@ void DJPlay(int song1, int song2) {
 		if (m >= size1) {
 			temp = 0;
 			m = size1 + 1;
-		} else if(rwff==1){
+		} else if(rwff1==1){
 			temp=0;
 		}else {
 			if (speed1 == 1) {
@@ -233,7 +237,7 @@ void DJPlay(int song1, int song2) {
 		if (i >= size2) {
 			temp = 0;
 			i = size2 + 1;
-		}else if(rwff==2){
+		}else if(rwff2==1){
 			temp=0;
 		}else {
 			if (speed2 == 1) {
@@ -258,9 +262,12 @@ void DJPlay(int song1, int song2) {
 			fx1point += 2;
 			soundBuffer[j] = soundBuffer[j] + (temp << 8);
 		}else {
-			rwff=0;
+			rwff1=0;
+			rwff2=0;
 			FX1 = 0;
 			fx1point = 0;
+			song1edit=0;
+			song2edit=0;
 		}
 		if (FX2 == 1 && fx2point < fx2.Size) {
 			temp = (FX2Buffer[fx2point + 1] << 8) | FX2Buffer[fx2point];
@@ -428,9 +435,7 @@ void stop_sound() {
 	stop = 1;
 	playSong = 0;
 	djplaysong=0;
-	stop_currently_playing = 0;
 	pause = 0;
-	startedSendingList = 0;
 	free(soundBuffer);
 
 }
@@ -473,10 +478,8 @@ void set_song(char * message) {
 }
 
 void set_dj(char * message) {
-	if (started == 1) {
 		stop_sound();
 		started = 0;
-	}
 	char temp[20];
 	sscanf(message, "%s %d %d", temp, &song1, &song2);
 	playSong = 0;
@@ -518,8 +521,10 @@ void rewind_dj(char * message) {
 			size += m/2;
 			m = 0;
 		}
-		rwff=1;
-		size+=17429;
+		rwff1=1;
+		if(song1edit==0)
+			size+=17429-(fx1point/2);
+		song1edit=1;
 	}
 	if (rewind2 == 1) {
 		rewind2 = 0;
@@ -530,8 +535,10 @@ void rewind_dj(char * message) {
 			smallsize += i/2;
 			i = 0;
 		}
-		rwff=2;
-		smallsize+=17429;
+		rwff2=1;
+		if(song2edit==0)
+			smallsize+=17429-(fx1point/2);
+		song2edit=1;
 
 	}
 }
@@ -551,9 +558,10 @@ void fastforward_dj(char * message) {
 			size -= (3000000 - m)/2;
 			m = 3000000;
 		}
-		rwff=1;
-		size+=17429;
-
+		rwff1=1;
+		if(song1edit==0)
+			size+=17429-(fx1point/2);
+		song1edit=1;
 	}
 	if (ff2 == 1) {
 		ff2 = 0;
@@ -564,9 +572,10 @@ void fastforward_dj(char * message) {
 			smallsize -= (3000000 - i)/2;
 			i = 3000000;
 		}
-		rwff=2;
-		smallsize+=17429;
-
+		rwff2=1;
+		if(song2edit==0)
+			smallsize+=17429-(fx1point/2);
+		song2edit=1;
 	}
 }
 

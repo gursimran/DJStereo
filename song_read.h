@@ -3,10 +3,10 @@
 #include <stdlib.h>
 #include <altera_up_sd_card_avalon_interface.h>
 
-alt_up_sd_card_dev *device_reference;
-listelement *songList;
-listelement *FXList;
-unsigned char * data;
+volatile alt_up_sd_card_dev *device_reference;
+volatile listelement *songList;
+volatile listelement *FXList;
+volatile unsigned char * data;
 
 int getSizeOfSong(char * name) {
 	int fileHandle;
