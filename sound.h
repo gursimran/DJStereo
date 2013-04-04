@@ -134,11 +134,8 @@ void DJPlay(int song1, int song2) {
 		smallsize = 3000000;
 
 	init_dj_interrupts();
-	playSong = 0;
-	djplaysong = 0;
 	//unsigned char * sound;
 	//usleep(1000000);
-	started = 0;
 	//y = 0;
 	soundBuffer1DJ = (unsigned char *) malloc(sizeof(unsigned char) * size);
 	soundBuffer2DJ
