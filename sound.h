@@ -426,6 +426,11 @@ void stop_sound() {
 	k = 0;
 	pause = 0;
 	stop = 1;
+	playSong = 0;
+	djplaysong=0;
+	stop_currently_playing = 0;
+	pause = 0;
+	startedSendingList = 0;
 	free(soundBuffer);
 
 }
@@ -526,7 +531,7 @@ void rewind_dj(char * message) {
 			i = 0;
 		}
 		rwff=2;
-		size+=17429;
+		smallsize+=17429;
 
 	}
 }
@@ -560,7 +565,7 @@ void fastforward_dj(char * message) {
 			i = 3000000;
 		}
 		rwff=2;
-		size+=17429;
+		smallsize+=17429;
 
 	}
 }
