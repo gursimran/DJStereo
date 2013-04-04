@@ -47,7 +47,6 @@ volatile int speed2 = 1;
 volatile int stop = 1;
 volatile int FX1 = 0;
 volatile int FX2 = 0;
-volatile int FX1_done=0;
 volatile int record_fileHandle;
 volatile int record_done;
 volatile int buffer_size = 10000;
@@ -258,9 +257,8 @@ void DJPlay(int song1, int song2) {
 			temp = (FX1Buffer[fx1point + 1] << 8) | FX1Buffer[fx1point];
 			fx1point += 2;
 			soundBuffer[j] = soundBuffer[j] + (temp << 8);
-		}else if (FX1==1 && fx1point >=fx1.Size){
-			rwff=0;
 		}else {
+			rwff=0;
 			FX1 = 0;
 			fx1point = 0;
 		}
