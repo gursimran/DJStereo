@@ -526,7 +526,7 @@ void rewind_dj(char * message) {
 			i = 0;
 		}
 		rwff=2;
-		size+=17429;
+		smallsize+=17429;
 
 	}
 }
@@ -560,7 +560,7 @@ void fastforward_dj(char * message) {
 			i = 3000000;
 		}
 		rwff=2;
-		size+=17429;
+		smallsize+=17429;
 
 	}
 }
