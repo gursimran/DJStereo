@@ -19,8 +19,6 @@ volatile  int a = 0;
 volatile  int song1;
 volatile  int song2;
 volatile  int y = 0;
-volatile  char sendingFile = 0;
-volatile  int fileSendPosition = 0;
 volatile  char stillComputingDataToBeSent = 0;
 volatile  unsigned int * soundBuffer;
 volatile  unsigned char * soundBuffer1DJ;
@@ -78,8 +76,7 @@ void read_wav_buffer(char *name, int size);
  int record_fileHandle;
  int record_done;
  int buffer_size = 10000;
- int rwff1=0;
- int rwff2=0;
+ int rwff=0;
  int song1edit=0;
  int song2edit=0;
 int fx1point = 0;
@@ -232,7 +229,7 @@ void DJPlay(int song1, int song2) {
 		if (m >= size1) {
 			temp = 0;
 			m = size1 + 1;
-		} else if(rwff1==1){
+		} else if(rwff==1){
 			temp=0;
 		}else {
 			if (speed1 == 1) {
@@ -262,7 +259,7 @@ void DJPlay(int song1, int song2) {
 		if (i >= size2) {
 			temp = 0;
 			i = size2 + 1;
-		}else if(rwff2==1){
+		}else if(rwff==2){
 			temp=0;
 		}else {
 			if (speed2 == 1) {
@@ -287,8 +284,7 @@ void DJPlay(int song1, int song2) {
 			fx1point += 2;
 			soundBuffer[j] = soundBuffer[j] + (temp << 8);
 		}else {
-			rwff1=0;
-			rwff2=0;
+			rwff=0;
 			FX1 = 0;
 			fx1point = 0;
 			song1edit=0;
@@ -364,7 +360,6 @@ void play_wav() {
 		playing = 0;
 		alt_up_audio_disable_write_interrupt(audio_dev);
 		alt_up_audio_reset_audio_core(audio_dev);
-		alt_up_sd_card_fclose(record_fileHandle);
 
 		free(soundBuffer);
 		free(soundBuffer1DJ);
@@ -390,7 +385,6 @@ void dj_play_wav() {
 		noTimes = 0;
 		alt_up_audio_disable_write_interrupt(audio_dev);
 		alt_up_audio_reset_audio_core(audio_dev);
-		stop = 1;
 		free(soundBuffer);
 		free(soundBuffer1DJ);
 		free(soundBuffer2DJ);
@@ -402,6 +396,7 @@ void dj_play_wav() {
 				alt_up_sd_card_write(record_fileHandle, recordBuffer[x]);
 			alt_up_sd_card_fclose(record_fileHandle);
 			printf("done writing to sd card\n");
+			free(recordBuffer);
 		}
 
 		mute = 0;
@@ -411,9 +406,9 @@ void dj_play_wav() {
 		m = 0;
 		a = 0;
 		y = 0;
-		record = 0;
 		size = 0;
 		smallsize = 0;
+		stop_sound();
 	} else {
 		k += 100;
 		if (k == buffer_size) {
@@ -423,28 +418,6 @@ void dj_play_wav() {
 	}
 }
 
-void sendFile() {
-	int next100samples;
-	unsigned char nextCheck[100];
-	if (fileSendPosition < 960088) {
-		for (next100samples = 0; next100samples < 100; next100samples++) {
-			nextCheck[next100samples] = recordBuffer[next100samples
-					+ fileSendPosition];
-		}
-		fileSendPosition += 100;
-	} else {
-		nextCheck[0] = 'e';
-		nextCheck[1] = 'n';
-		nextCheck[2] = 'd';
-		nextCheck[3] = '\0';
-		sendingFile = 0;
-		fileSendPosition = 0;
-		free(recordBuffer);
-	}
-	sendData(nextCheck);
-	stillComputingDataToBeSent = 0;
-
-}
 void record_song() {
 	record_fileHandle = alt_up_sd_card_fopen("MIX.WAV", false);
 	record = 1;
@@ -457,7 +430,6 @@ void stop_sound() {
 	started = 1;
 	k = 0;
 	pause = 0;
-	stop = 1;
 	playSong = 0;
 	djplaysong=0;
 	free(soundBuffer);
@@ -528,9 +500,9 @@ void rewind_dj(char * message) {
 			size += m/2;
 			m = 0;
 		}
-		rwff1=1;
+		rwff=1;
 		if(song1edit==0)
-			size+=17429-(fx1point/2);
+		size+=17429-(fx1point/2);
 		song1edit=1;
 	}
 	if (rewind2 == 1) {
@@ -542,7 +514,7 @@ void rewind_dj(char * message) {
 			smallsize += i/2;
 			i = 0;
 		}
-		rwff2=1;
+		rwff=2;
 		if(song2edit==0)
 			smallsize+=17429-(fx1point/2);
 		song2edit=1;
@@ -565,7 +537,7 @@ void fastforward_dj(char * message) {
 			size -= (3000000 - m)/2;
 			m = 3000000;
 		}
-		rwff1=1;
+		rwff=1;
 		if(song1edit==0)
 			size+=17429-(fx1point/2);
 		song1edit=1;
@@ -579,7 +551,7 @@ void fastforward_dj(char * message) {
 			smallsize -= (3000000 - i)/2;
 			i = 3000000;
 		}
-		rwff2=1;
+		rwff=2;
 		if(song2edit==0)
 			smallsize+=17429-(fx1point/2);
 		song2edit=1;

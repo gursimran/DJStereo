@@ -85,11 +85,8 @@ void ReadData(void * context, unsigned int irq_id) {
 			fastforward_dj(command);
 		} else if (command[0] == 'h'){
 			record_song();
-		}else if (command[0] == 'u'){
-			if (sendingFile == 1 && stillComputingDataToBeSent == 0){
-				stillComputingDataToBeSent = 1;
-				sendFile();
-			}
+		} else if(command[0]=='o'){
+			stop=1;
 		}
 
 		printf("\n");
