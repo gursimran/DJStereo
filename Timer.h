@@ -5,7 +5,7 @@
 
 
 
-volatile int s = 0;
+int s = 0;
 //char playSong = 0;
 
 void sendData(char * message) {
