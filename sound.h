@@ -432,11 +432,7 @@ void stop_sound() {
 	stop = 1;
 	playSong = 0;
 	djplaysong=0;
-	stop_currently_playing = 0;
-	pause = 0;
-	startedSendingList = 0;
 	free(soundBuffer);
-
 }
 
 void pause_sound() {
@@ -447,22 +443,6 @@ void pause_sound() {
 void resume_sound() {
 	pause = 0;
 	alt_up_audio_enable_write_interrupt(audio_dev);
-}
-
-void next_sound() {
-	stop_sound();
-	++a;
-	started = 0;
-	playSong = 1;
-	//play_song(a);
-}
-
-void previous_sound() {
-	stop_sound();
-	--a;
-	started = 0;
-	playSong = 1;
-	//play_song(a);
 }
 
 void set_song(char * message) {
