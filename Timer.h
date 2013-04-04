@@ -59,11 +59,7 @@ void ReadData(void * context, unsigned int irq_id) {
 			sendData( songString);
 			free(songString);
 			startedSendingList = 1;
-		} else if (command[0] == 'b') {
-			previous_sound();
-		} else if (command[0] == 'n') {
-			next_sound();
-		} else if (command[0] == 'v'){
+		}  else if (command[0] == 'v'){
 			set_volume(command);
 		} else if (command[0] == 'a'){
 			if (startedSendingList == 1){

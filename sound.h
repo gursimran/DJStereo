@@ -34,32 +34,60 @@ volatile  int noTimes = 0;
 volatile  int reach1000;
 volatile  char readMore = 0;
 void readWavFromSDCARD(char *name, unsigned char *levelBricksToDraw);
- void configure_audio();
- void read_wav(char *name, unsigned int size, unsigned char* soundbuff);
- void play_wav();
- void dj_play_wav();
- void read_wav_buffer(char *name, int size);
-volatile  int volume = 5;
-volatile  int djvolume1 = 7;
-volatile  int djvolume2 = 7;
-volatile  int speed1 = 1;
-volatile int speed2 = 1;
- volatile int stop = 1;
- volatile int FX1 = 0;
- volatile  int FX2 = 0;
- volatile int record_fileHandle;
- volatile int record_done;
- volatile int buffer_size = 10000;
- volatile int rwff1=0;
- volatile  int rwff2=0;
- volatile  int fx1point = 0;
- volatile  char song1edit=0;
- volatile  char song2edit=0;
+//<<<<<<< HEAD
+// void configure_audio();
+// void read_wav(char *name, unsigned int size, unsigned char* soundbuff);
+// void play_wav();
+// void dj_play_wav();
+// void read_wav_buffer(char *name, int size);
+//volatile  int volume = 5;
+//volatile  int djvolume1 = 7;
+//volatile  int djvolume2 = 7;
+//volatile  int speed1 = 1;
+//volatile int speed2 = 1;
+// volatile int stop = 1;
+// volatile int FX1 = 0;
+// volatile  int FX2 = 0;
+// volatile int record_fileHandle;
+// volatile int record_done;
+// volatile int buffer_size = 10000;
+// volatile int rwff1=0;
+// volatile  int rwff2=0;
+// volatile  int fx1point = 0;
+// volatile  char song1edit=0;
+// volatile  char song2edit=0;
+//
+//
+//
+// volatile  int size = 0;
+// volatile  int smallsize = 0;
+//=======
+void configure_audio();
+void read_wav(char *name, unsigned int size, unsigned char* soundbuff);
+void play_wav();
+void dj_play_wav();
+void read_wav_buffer(char *name, int size);
+ int volume = 5;
+ int djvolume1 = 7;
+ int djvolume2 = 7;
+ int speed1 = 1;
+ int speed2 = 1;
+ int stop = 1;
+ int FX1 = 0;
+ int FX2 = 0;
+ int record_fileHandle;
+ int record_done;
+ int buffer_size = 10000;
+ int rwff1=0;
+ int rwff2=0;
+ int song1edit=0;
+ int song2edit=0;
+int fx1point = 0;
 
 
 
- volatile  int size = 0;
- volatile  int smallsize = 0;
+ int size = 0;
+ int smallsize = 0;
 
 static void init_button_pio() {
 	alt_irq_register(AUDIO_0_IRQ, NULL, play_wav);
@@ -134,11 +162,8 @@ void DJPlay(int song1, int song2) {
 		smallsize = 3000000;
 
 	init_dj_interrupts();
-	playSong = 0;
-	djplaysong = 0;
 	//unsigned char * sound;
 	//usleep(1000000);
-	started = 0;
 	//y = 0;
 	soundBuffer1DJ = (unsigned char *) malloc(sizeof(unsigned char) * size);
 	soundBuffer2DJ
@@ -435,9 +460,7 @@ void stop_sound() {
 	stop = 1;
 	playSong = 0;
 	djplaysong=0;
-	pause = 0;
 	free(soundBuffer);
-
 }
 
 void pause_sound() {
@@ -448,22 +471,6 @@ void pause_sound() {
 void resume_sound() {
 	pause = 0;
 	alt_up_audio_enable_write_interrupt(audio_dev);
-}
-
-void next_sound() {
-	stop_sound();
-	++a;
-	started = 0;
-	playSong = 1;
-	//play_song(a);
-}
-
-void previous_sound() {
-	stop_sound();
-	--a;
-	started = 0;
-	playSong = 1;
-	//play_song(a);
 }
 
 void set_song(char * message) {

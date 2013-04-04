@@ -45,11 +45,6 @@ int main(){
 		}
 		else if(djplaysong==1){
 			printf("gonna play dj songs\n");
-			free(soundBuffer);
-			free(soundBuffer1DJ);
-			free(soundBuffer2DJ);
-			free(FX1Buffer);
-			free(FX2Buffer);
 			DJPlay(song1, song2);
 			playSong=0;
 		}
