@@ -51,6 +51,7 @@ volatile int FX1_done=0;
 volatile int record_fileHandle;
 volatile int record_done;
 volatile int buffer_size = 10000;
+volatile int rwff=0;
 
 
 volatile int size = 0;
@@ -203,7 +204,9 @@ void DJPlay(int song1, int song2) {
 		if (m >= size1) {
 			temp = 0;
 			m = size1 + 1;
-		} else {
+		} else if(rwff==1){
+			temp=0;
+		}else {
 			if (speed1 == 1) {
 				m = m + 2;
 			} else if (speed1 == 2) {
@@ -231,7 +234,9 @@ void DJPlay(int song1, int song2) {
 		if (i >= size2) {
 			temp = 0;
 			i = size2 + 1;
-		} else {
+		}else if(rwff==2){
+			temp=0;
+		}else {
 			if (speed2 == 1) {
 				i = i + 2;
 			} else if (speed2 == 2) {
@@ -253,11 +258,11 @@ void DJPlay(int song1, int song2) {
 			temp = (FX1Buffer[fx1point + 1] << 8) | FX1Buffer[fx1point];
 			fx1point += 2;
 			soundBuffer[j] = soundBuffer[j] + (temp << 8);
-			FX1_done=0;
+		}else if (FX==1 && fx1point >=fx1.Size){
+			rwff=0;
 		}else {
 			FX1 = 0;
 			fx1point = 0;
-			FX1_done=1;
 		}
 		if (FX2 == 1 && fx2point < fx2.Size) {
 			temp = (FX2Buffer[fx2point + 1] << 8) | FX2Buffer[fx2point];
@@ -501,7 +506,6 @@ void rewind_dj(char * message) {
 	int rewind2;
 
 	sscanf(message, "%s %d %d", temp, &rewind1, &rewind2);
-	while(FX1_done==0);
 	if (rewind1 == 1) {
 		rewind1 = 0;
 		if (m > 250000) {
@@ -511,6 +515,7 @@ void rewind_dj(char * message) {
 			size += m;
 			m = 0;
 		}
+		rwff=1;
 	}
 	if (rewind2 == 1) {
 		rewind2 = 0;
@@ -521,6 +526,7 @@ void rewind_dj(char * message) {
 			smallsize += i;
 			i = 0;
 		}
+		rwff=2;
 	}
 }
 
@@ -530,7 +536,6 @@ void fastforward_dj(char * message) {
 	int ff2;
 
 	sscanf(message, "%s %d %d", temp, &ff1, &ff2);
-	while(FX1_done==0);
 	if (ff1 == 1) {
 		ff1 = 0;
 		if (m < 2750000) {
@@ -540,6 +545,7 @@ void fastforward_dj(char * message) {
 			size -= (3000000 - m);
 			m = 3000000;
 		}
+		rwff=1;
 	}
 	if (ff2 == 1) {
 		ff2 = 0;
@@ -550,6 +556,7 @@ void fastforward_dj(char * message) {
 			smallsize -= (3000000 - i);
 			i = 3000000;
 		}
+		rwff=2;
 	}
 }
 

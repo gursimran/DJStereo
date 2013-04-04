@@ -81,12 +81,11 @@ void ReadData(void * context, unsigned int irq_id) {
 			//play FX1
 			FX2=1;
 		} else if (command[0]=='w'){
-			FX1_done=0;
 			FX1=1;
 			rewind_dj(command);
+
 		} else if (command[0] == 'y'){
 			FX1=1;
-			FX1_done=0;
 			fastforward_dj(command);
 		} else if (command[0] == 'h'){
 			record_song();
