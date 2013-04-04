@@ -258,7 +258,7 @@ void DJPlay(int song1, int song2) {
 			temp = (FX1Buffer[fx1point + 1] << 8) | FX1Buffer[fx1point];
 			fx1point += 2;
 			soundBuffer[j] = soundBuffer[j] + (temp << 8);
-		}else if (FX==1 && fx1point >=fx1.Size){
+		}else if (FX1==1 && fx1point >=fx1.Size){
 			rwff=0;
 		}else {
 			FX1 = 0;
