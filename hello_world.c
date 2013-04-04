@@ -50,7 +50,6 @@ int main(){
 			free(soundBuffer2DJ);
 			free(FX1Buffer);
 			free(FX2Buffer);
-			free(FX3Buffer);
 			DJPlay(song1, song2);
 			playSong=0;
 		}

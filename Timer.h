@@ -79,16 +79,14 @@ void ReadData(void * context, unsigned int irq_id) {
 			set_djspeed(command);
 		} else if(command[0]=='1'){
 			//play FX1
-			FX1=1;
-		} else if(command[0]=='2'){
-			//play FX2
 			FX2=1;
-		} else if (command[0]=='3'){
-			//play FX3
-			FX3=1;
 		} else if (command[0]=='w'){
+			FX1_done=0;
+			FX1=1;
 			rewind_dj(command);
 		} else if (command[0] == 'y'){
+			FX1=1;
+			FX1_done=0;
 			fastforward_dj(command);
 		} else if (command[0] == 'h'){
 			record_song();

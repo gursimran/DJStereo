@@ -27,7 +27,6 @@ volatile unsigned char * soundBuffer1DJ;
 volatile unsigned char * soundBuffer2DJ;
 volatile unsigned char * FX1Buffer;
 volatile unsigned char * FX2Buffer;
-volatile unsigned char * FX3Buffer;
 volatile unsigned char * recordBuffer;
 volatile int record = 0;
 
@@ -48,10 +47,11 @@ volatile int speed2 = 1;
 volatile int stop = 1;
 volatile int FX1 = 0;
 volatile int FX2 = 0;
-volatile int FX3 = 0;
+volatile int FX1_done=0;
 volatile int record_fileHandle;
 volatile int record_done;
 volatile int buffer_size = 10000;
+
 
 volatile int size = 0;
 volatile int smallsize = 0;
@@ -144,13 +144,10 @@ void DJPlay(int song1, int song2) {
 
 	song fx1 = getItemAt(FXList, 0);
 	song fx2 = getItemAt(FXList, 1);
-	song fx3 = getItemAt(FXList, 2);
 	FX1Buffer = (unsigned char *) malloc(sizeof(unsigned char) * fx1.Size);
 	FX2Buffer = (unsigned char *) malloc(sizeof(unsigned char) * fx2.Size);
-	FX3Buffer = (unsigned char *) malloc(sizeof(unsigned char) * fx3.Size);
 	read_wav(fx1.name, fx1.Size, FX1Buffer);
 	read_wav(fx2.name, fx2.Size, FX2Buffer);
-	read_wav(fx3.name, fx3.Size, FX3Buffer);
 
 	read_wav(bigsong.name, size, soundBuffer1DJ);
 	read_wav(smallsong.name, smallsize, soundBuffer2DJ);
@@ -166,7 +163,6 @@ void DJPlay(int song1, int song2) {
 	k = 0;
 	int fx1point = 0;
 	int fx2point = 0;
-	int fx3point = 0;
 	i = 0;
 	m = 0;
 	int j = 0;
@@ -257,9 +253,11 @@ void DJPlay(int song1, int song2) {
 			temp = (FX1Buffer[fx1point + 1] << 8) | FX1Buffer[fx1point];
 			fx1point += 2;
 			soundBuffer[j] = soundBuffer[j] + (temp << 8);
-		} else {
+			FX1_done=0;
+		}else {
 			FX1 = 0;
 			fx1point = 0;
+			FX1_done=1;
 		}
 		if (FX2 == 1 && fx2point < fx2.Size) {
 			temp = (FX2Buffer[fx2point + 1] << 8) | FX2Buffer[fx2point];
@@ -269,15 +267,6 @@ void DJPlay(int song1, int song2) {
 		} else {
 			FX2 = 0;
 			fx2point = 0;
-		}
-		if (FX3 == 1 && fx3point < fx3.Size) {
-			temp = (FX3Buffer[fx1point + 1] << 8) | FX3Buffer[fx1point];
-			fx3point += 2;
-			soundBuffer[j] = soundBuffer[j] + (temp << 8);
-
-		} else {
-			FX3 = 0;
-			fx3point = 0;
 		}
 		if (record == 1 && record_point < 85) {
 			if (record_point == 0)
@@ -372,7 +361,6 @@ void dj_play_wav() {
 		free(soundBuffer2DJ);
 		free(FX1Buffer);
 		free(FX2Buffer);
-		free(FX3Buffer);
 		if (record_done == 1) {
 			int x;
 			for (x = 0; x < 960087; x++)
@@ -513,7 +501,7 @@ void rewind_dj(char * message) {
 	int rewind2;
 
 	sscanf(message, "%s %d %d", temp, &rewind1, &rewind2);
-
+	while(FX1_done==0);
 	if (rewind1 == 1) {
 		rewind1 = 0;
 		if (m > 250000) {
@@ -542,6 +530,7 @@ void fastforward_dj(char * message) {
 	int ff2;
 
 	sscanf(message, "%s %d %d", temp, &ff1, &ff2);
+	while(FX1_done==0);
 	if (ff1 == 1) {
 		ff1 = 0;
 		if (m < 2750000) {
