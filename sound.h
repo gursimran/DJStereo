@@ -426,6 +426,11 @@ void stop_sound() {
 	k = 0;
 	pause = 0;
 	stop = 1;
+	playSong = 0;
+	djplaysong=0;
+	stop_currently_playing = 0;
+	pause = 0;
+	startedSendingList = 0;
 	free(soundBuffer);
 
 }
