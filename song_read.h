@@ -3,11 +3,13 @@
 #include <stdlib.h>
 #include <altera_up_sd_card_avalon_interface.h>
 
+
 volatile alt_up_sd_card_dev *device_reference;
 volatile listelement *songList;
 volatile listelement *FXList;
 volatile unsigned char * data;
 
+//GET SIZE OF SONG
 int getSizeOfSong(char * name) {
 	int fileHandle;
 	short dataRead;
@@ -15,57 +17,62 @@ int getSizeOfSong(char * name) {
 	fileHandle = alt_up_sd_card_fopen(name, false);
 	int n = 0;
 	data = (unsigned char *) malloc(32 * sizeof(unsigned char));
-	// Get first 8 bytes of file
+	// Get first 32 bytes of file (size and byte rate) 
 	while (n < 32) {
-		// If new line character then write data to next line
-		// and (increment column)
 		dataRead = alt_up_sd_card_read(fileHandle);
-		//dataRead=dataRead & '0000000011111111';
 		data[n] = dataRead;
-		//Print the bytes that are read
-		//printf("%x ",data[n]);
 		n++;
 	}
 
+    //Close the file
+    alt_up_sd_card_fclose(fileHandle);
+    
+    //Calculate size
 	int total_size = (data[7] << 24) | (data[6] << 16) | (data[5] << 8)
 			| data[4];
-	//printf("%d ", total_size);
 
+    //Add 8 bytes to size
 	total_size += 8;
-	alt_up_sd_card_fclose(fileHandle);
-
+	
 	return total_size;
 }
+
+//GET LENGTH OF SONG IN MILLISECONDS
 int getLengthOfSong(int total_size) {
 
-	//Printing the size of the file in bytes as well as the byte rate
-	//printf("%d\n", total_size);
-	//
+	//Get byte rate of song
 	int byte_rate = (data[31] << 24) | (data[30] << 16) | (data[29] << 8)
 			| data[28];
-	//printf("%d\n", byte_rate);
+    
+    //Time = size * 1000 /byte rate
 	int time = (total_size * 1000.0) / byte_rate;
 
-	//Close file
+	//Free file date
 	free(data);
+    
 	return time;
 }
 
+//METHOD TO GET SONG NAME AND ARTIST IN HEADER OF FILE
 void getSongName(char * name, char * songname, char * songartist) {
-	int fileHandle;
+	
+    int fileHandle;
 	short dataRead, dataRead2, dataRead3, dataRead4;
-	// Get file handle
+	
+    // Get file handle
 	fileHandle = alt_up_sd_card_fopen(name, false);
 	int n = 0;
-	//free(data);
-	data = (unsigned char *) malloc(30 * sizeof(unsigned char));
-	while (n < 56) {
+	
+    data = (unsigned char *) malloc(30 * sizeof(unsigned char));
+	
+    while (n < 56) {
 		//Read 56 times to get to the right point in the file to read song name
 		dataRead = alt_up_sd_card_read(fileHandle);
 		n++;
 	}
 	n = 0;
-	dataRead = alt_up_sd_card_read(fileHandle);
+	
+    dataRead = alt_up_sd_card_read(fileHandle);
 
 	//Read song name
 	while (dataRead != 0 || n < 2) {
@@ -83,6 +90,7 @@ void getSongName(char * name, char * songname, char * songartist) {
 	dataRead = alt_up_sd_card_read(fileHandle);
 	n = 0;
 
+    //KEEP READING TILL "..." in FILE, REPRESENTS NEXT BYTE IS ARTIST
 	while ((!(dataRead == dataRead2 && dataRead2 == dataRead3) && n < 10)) {
 		dataRead3 = dataRead2;
 		dataRead2 = dataRead;
@@ -90,6 +98,7 @@ void getSongName(char * name, char * songname, char * songartist) {
 		n++;
 	}
 
+    //GET ARTIST
 	dataRead = alt_up_sd_card_read(fileHandle);
 	n = 0;
 	while (dataRead != 0) {
@@ -100,9 +109,11 @@ void getSongName(char * name, char * songname, char * songartist) {
 	data[n] = '\0';
 	strcpy(songartist, data);
 
+    //CLOST FILE
 	alt_up_sd_card_fclose(fileHandle);
 }
 
+//METHOD TO READ ALL SONGS FROM SD CARD
 void readSongsFromSDCard() {
 	num_songs = 0;
 	num_FX = 0;
@@ -127,27 +138,46 @@ void readSongsFromSDCard() {
 			}
 		}
 	}
-
+   
+    //CHECK IF FILES EXIST IN DCARD
 	if (alt_up_sd_card_find_first(".", songFileName) != 0) {
 		printf("Could not find any files in the SD card");
 		return 0;
 	} else {
 		do {
+            //CHECK IF FILE IS WAV FILE
 			if (strstr(songFileName, "WAV") != NULL) {
 				song x;
+                
+                //GET SIZE AND LENGTH OF SONG
 				x.Size = getSizeOfSong(songFileName);
 				x.LENGTH = getLengthOfSong(x.Size);
+                
+                //SAVE FILENAME TO SONG STRUCT
 				strcpy(x.name, songFileName);
 
+                //CHECK IF FILE IF AN EFFECT OR A SONG
 				if (strstr(songFileName, "FX") == NULL) {
+                    //GET SONG ID
 					x.ID = num_songs;
+                    
+                    //GET ARTIST AND FULL SONG NAME FROM FILE HEARDER
 					getSongName(songFileName, x.realname, x.artist);
+                    
+                    //FREE DATA READ FROM FILE
 					free(data);
+                    
+                    //ADD SONG TO SONG LIST
 					songList = AddItem(songList, x, 0);
 				} else {
+                    //GET EFFECTS ID
 					x.ID = num_FX;
+                    
+                    //SET FULL NAME AND ARTIST TO DUMMY
 					strcpy(x.realname, "dummy");
 					strcpy(x.artist, "dummy");
+                    
+                    //ADD EFFECT TO EFFECT LIST
 					FXList = AddItem(FXList, x, 1);
 				}
 

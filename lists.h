@@ -4,15 +4,18 @@ typedef struct {
     struct listelement *link;
 }listelement;
 
+//Variables for keeping count of number of songs, effects and how many songs to send to android in one chunk
 volatile int send_num_songs = 3;
 volatile int sent_songs = 0;
+volatile int num_songs = 0;
+volatile int num_FX = 0;
+volatile char * songString;
+
 //ADD, REMOVE, GET TO ITEM FUNCTIONS FOR QUEUES
 listelement * AddItem (listelement * listpointer, song data, int flag);
 listelement * RemoveItem (listelement * listpointer);
 volatile song getItem (listelement * listpointer);
-volatile int num_songs = 0;
-volatile int num_FX = 0;
-volatile char * songString;
+
 
 //ADDITEM TO QUEUE
 listelement * AddItem (listelement * listpointer, song data, int flag) {
@@ -65,7 +68,7 @@ song getItem (listelement * listpointer) {
     return listpointer -> dataitem;
 }
 
-
+//PRINT THE ENTIRE SONG QUEUE
 void PrintQueue (listelement * listpointer) {
 
     if (listpointer == NULL)
@@ -78,33 +81,34 @@ void PrintQueue (listelement * listpointer) {
     printf ("\n");
 }
 
-
+//RETURNS THE ITEM AT POSITION
 song getItemAt (listelement * listpointer, int location){
-	//printf("getting called\n");
 	int loc = location;
-	//printf("loc: %d\n",loc);
 	--loc;
-	//printf("\n %d test \n",location);
 	int q;
 	if (listpointer != NULL){
 		for (q=0;q<=loc; q++){
-			//printf("%d\n",q);
 			listpointer = listpointer -> link;
 		}
 	}
 	return listpointer -> dataitem;
 }
 
+//CREATE A STRING OF SONGS TO BE SENT TO THE DE2
 void song_string(listelement * listpointer){
 	int l;
 	char k[20];
 	songString = (char*)malloc (num_songs * (sizeof(song)+(sizeof(char)*3)));
-	//strcpy(songString, "");
-	if (sent_songs + send_num_songs > num_songs){
+	
+    //CHECK IF THE NUMBER OF SONGS REMAINING TO BE SENT IS LESS THAN DEFAULT SONGS IN ONE CHUNK
+    if (sent_songs + send_num_songs > num_songs){
 		send_num_songs = num_songs - sent_songs;
 	}
 	sent_songs = sent_songs + send_num_songs;
-	for(l=0; l<send_num_songs; l++){
+	
+    //CREATE A STRING OF NUMBER OF SONGS TO BE SENT
+    //AT END OF STRING ADD '\0'
+    for(l=0; l<send_num_songs; l++){
 		song m = getItemAt(listpointer, sent_songs-send_num_songs+l);
 		sprintf(k, "%d", m.ID);
 		if (l == 0){

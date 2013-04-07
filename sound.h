@@ -8,6 +8,15 @@
 #include "assert.h"
 #include "sys/alt_irq.h"
 
+//METHOD DECLARATIONS
+void readWavFromSDCARD(char *name, unsigned char *levelBricksToDraw);
+void configure_audio();
+void read_wav(char *name, unsigned int size, unsigned char* soundbuff);
+void play_wav();
+void dj_play_wav();
+void read_wav_buffer(char *name, int size);
+
+//GLOBAL VARIABLES FOR SOUND
 volatile char mute = 0;
 volatile  char playing = 0;
 volatile  char started = 0;
@@ -27,99 +36,64 @@ volatile  unsigned char * FX1Buffer;
 volatile  unsigned char * FX2Buffer;
 volatile  unsigned char * recordBuffer;
 volatile  int record = 0;
-
 volatile  int noTimes = 0;
 volatile  int reach1000;
 volatile  char readMore = 0;
-void readWavFromSDCARD(char *name, unsigned char *levelBricksToDraw);
-//<<<<<<< HEAD
-// void configure_audio();
-// void read_wav(char *name, unsigned int size, unsigned char* soundbuff);
-// void play_wav();
-// void dj_play_wav();
-// void read_wav_buffer(char *name, int size);
-//volatile  int volume = 5;
-//volatile  int djvolume1 = 7;
-//volatile  int djvolume2 = 7;
-//volatile  int speed1 = 1;
-//volatile int speed2 = 1;
-// volatile int stop = 1;
-// volatile int FX1 = 0;
-// volatile  int FX2 = 0;
-// volatile int record_fileHandle;
-// volatile int record_done;
-// volatile int buffer_size = 10000;
-// volatile int rwff1=0;
-// volatile  int rwff2=0;
-// volatile  int fx1point = 0;
-// volatile  char song1edit=0;
-// volatile  char song2edit=0;
-//
-//
-//
-// volatile  int size = 0;
-// volatile  int smallsize = 0;
-//=======
-void configure_audio();
-void read_wav(char *name, unsigned int size, unsigned char* soundbuff);
-void play_wav();
-void dj_play_wav();
-void read_wav_buffer(char *name, int size);
- int volume = 5;
- int djvolume1 = 7;
- int djvolume2 = 7;
- int speed1 = 1;
- int speed2 = 1;
- int stop = 1;
- int FX1 = 0;
- int FX2 = 0;
- int record_fileHandle;
- int record_done;
- int buffer_size = 10000;
- int rwff=0;
- int song1edit=0;
- int song2edit=0;
+int volume = 5;
+int djvolume1 = 7;
+int djvolume2 = 7;
+int speed1 = 1;
+int speed2 = 1;
+int stop = 1;
+int FX1 = 0;
+int FX2 = 0;
+int record_fileHandle;
+int record_done;
+int buffer_size = 10000;
+int rwff=0;
+int song1edit=0;
+int song2edit=0;
 int fx1point = 0;
+int size = 0;
+int smallsize = 0;
 
 
-
- int size = 0;
- int smallsize = 0;
-
+//SET SOUND INTERRUPT ISR FOR REGULAR MUSIC PLAY
 static void init_button_pio() {
 	alt_irq_register(AUDIO_0_IRQ, NULL, play_wav);
 	alt_up_audio_disable_write_interrupt(audio_dev);
 }
 
+//SET SOUND INTERRUPT ISR FOR DJ SONG
 static void init_dj_interrupts() {
 	printf("set dj interrupts\n");
 	alt_irq_register(AUDIO_0_IRQ, NULL, dj_play_wav);
 	alt_up_audio_disable_write_interrupt(audio_dev);
 }
 
-void play_song(int song_to_play) {
 
+//Method to play next song
+void play_song(int song_to_play) {
 	a = song_to_play % num_songs;
-	//if (a<num_songs){
+    //Get song info
 	song b = getItemAt(songList, a);
-	size = b.Size / 2;
-	init_button_pio();
+	
+    //set size
+    size = b.Size / 2;
+	
+    //set interrupts
+    init_button_pio();
+    
 	playSong = 0;
-	//unsigned char * sound;
-	//usleep(1000000);
 	started = 0;
 	y = 0;
 	printf("calling method now to read file for song: %d\n", a);
-	read_wav_buffer(b.name, b.Size);
+	//dynamically load file
+    read_wav_buffer(b.name, b.Size);
 	printf("returned from method, no of times: %d\n", noTimes);
-	//a++;
-	while (started == 1)
-		;
+	//wait till song finishes
+    while (started == 1);
 	started = 0;
-	//playSong=1;
-	//alt_up_audio_enable_write_interrupt(audio_dev);
-	//alt_up_audio_enable_write_interrupt(audio_dev);
-	//}
 }
 
 void DJPlay(int song1, int song2) {
@@ -345,26 +319,32 @@ void DJPlay(int song1, int song2) {
 
 }
 
+
+//ISR for regular music song
 void play_wav() {
 	alt_up_audio_write_fifo(audio_dev, &(soundBuffer[k]), 100,
 			ALT_UP_AUDIO_RIGHT);
 	alt_up_audio_write_fifo(audio_dev, &(soundBuffer[k]), 100,
 			ALT_UP_AUDIO_LEFT);
+    
+    //check if number of bytes played have been played as size of song
 	if ((buffer_size * noTimes) + 100 + k >= size) {
-		k = 0;
+		//reset song variables and disable song interrupt
+        k = 0;
 		noTimes = 0;
-		//playSong = 1;
 		started = 0;
-		//a++;
 		y = 0;
 		playing = 0;
 		alt_up_audio_disable_write_interrupt(audio_dev);
 		alt_up_audio_reset_audio_core(audio_dev);
 
+        //free all buffers
 		free(soundBuffer);
 		free(soundBuffer1DJ);
 		free(soundBuffer2DJ);
 	} else {
+        
+        //load the next 100 bytes of data in sound buffer
 		k += 100;
 		if (k == buffer_size) {
 			k = 0;
@@ -373,23 +353,31 @@ void play_wav() {
 	}
 }
 
+
+//ISR for dj songs
 void dj_play_wav() {
 	alt_up_audio_write_fifo(audio_dev, &(soundBuffer[k]), 100,
 			ALT_UP_AUDIO_RIGHT);
 	alt_up_audio_write_fifo(audio_dev, &(soundBuffer[k]), 100,
 			ALT_UP_AUDIO_LEFT);
 
+    //check if the bytes played is equal to the size of song
 	if (((buffer_size * noTimes) + 100 + k >= size && (buffer_size * noTimes)
 			+ 100 + k >= smallsize) || stop == 1) {
+        //reset variables to be played again
 		k = 0;
 		noTimes = 0;
 		alt_up_audio_disable_write_interrupt(audio_dev);
 		alt_up_audio_reset_audio_core(audio_dev);
+        
+        //free buffers
 		free(soundBuffer);
 		free(soundBuffer1DJ);
 		free(soundBuffer2DJ);
 		free(FX1Buffer);
 		free(FX2Buffer);
+        
+        //if user chose to record then write the recording to file
 		if (record_done == 1) {
 			int x;
 			for (x = 0; x < 960087; x++)
@@ -397,8 +385,11 @@ void dj_play_wav() {
 			alt_up_sd_card_fclose(record_fileHandle);
 			printf("done writing to sd card\n");
 		}
+        
+        //free record buffer
 		free(recordBuffer);
 
+        //reset other variables
 		mute = 0;
 		playing = 0;
 		started = 0;
@@ -409,7 +400,9 @@ void dj_play_wav() {
 		size = 0;
 		smallsize = 0;
 		stop_sound();
-	} else {
+	}
+    //load next 100 bytes to be played
+    else {
 		k += 100;
 		if (k == buffer_size) {
 			k = 0;
@@ -418,12 +411,17 @@ void dj_play_wav() {
 	}
 }
 
+//initialize the 
 void record_song() {
 	record_fileHandle = alt_up_sd_card_fopen("MIX.WAV", false);
 	record = 1;
 }
 
+
+//Stop currently playing
 void stop_sound() {
+    
+    //reset all variables
 	alt_up_audio_disable_write_interrupt(audio_dev);
 	stop_currently_playing = 1;
 	noTimes = 0;
@@ -435,16 +433,22 @@ void stop_sound() {
 	free(soundBuffer);
 }
 
+
+//Pause currently playing song
 void pause_sound() {
 	pause = 1;
 	alt_up_audio_disable_write_interrupt(audio_dev);
 }
 
+
+//Resume song that was being played
 void resume_sound() {
 	pause = 0;
 	alt_up_audio_enable_write_interrupt(audio_dev);
 }
 
+
+//Get song to play in music player mode
 void set_song(char * message) {
 	char temp[20];
 	sscanf(message, "%s %d", temp, &a);
@@ -453,9 +457,9 @@ void set_song(char * message) {
 		started = 0;
 	}
 	playSong = 1;
-	//djplaysong=0;
 }
 
+//Get the two songs to play in dj 
 void set_dj(char * message) {
 		stop_sound();
 		started = 0;
@@ -466,9 +470,9 @@ void set_dj(char * message) {
 	speed2 = 1;
 	stop = 0;
 	djplaysong = 1;
-	//playSong=0;
 }
 
+//Set volume of each song in dj mode
 void set_djvolume(char * message) {
 	int tempV;
 	int tempV2;
@@ -479,20 +483,29 @@ void set_djvolume(char * message) {
 	djvolume2 = tempV2 / 10;
 }
 
+//Set speed of each song in DJ mode
 void set_djspeed(char * message) {
 	char temp[20];
 	sscanf(message, "%s %d %d", temp, &speed1, &speed2);
 	printf("speed1: %d\n speed2: %d\n", speed1, speed2);
 }
 
+
+//rewind song by 5 secs
 void rewind_dj(char * message) {
 	char temp[5];
 	int rewind1;
 	int rewind2;
 
+    //get which song to rewind from android command
+    
 	sscanf(message, "%s %d %d", temp, &rewind1, &rewind2);
-	if (rewind1 == 1) {
+	
+    //if song 1 needs to be rewinded
+    if (rewind1 == 1) {
 		rewind1 = 0;
+        
+        //if current position is less than 250,000 then set it to 0 (start of data) else minus 250,000
 		if (m > 250000) {
 			m -= 250000;
 			size += 125000;
@@ -501,12 +514,18 @@ void rewind_dj(char * message) {
 			m = 0;
 		}
 		rwff=1;
+        
+         //play scratching effect
 		if(song1edit==0)
 		size+=17429-(fx1point/2);
 		song1edit=1;
 	}
+    
+    //if song 2 needs to be rewinded
 	if (rewind2 == 1) {
 		rewind2 = 0;
+        
+        //if current position is less than 250,000 then set it to 0 (start of data) else minus 250,000
 		if (i > 250000) {
 			i -= 250000;
 			smallsize += 125000;
@@ -515,6 +534,8 @@ void rewind_dj(char * message) {
 			i = 0;
 		}
 		rwff=2;
+        
+         //play scratching effect
 		if(song2edit==0)
 			smallsize+=17429-(fx1point/2);
 		song2edit=1;
@@ -522,14 +543,21 @@ void rewind_dj(char * message) {
 	}
 }
 
+
+//fast forward song by 5 secs
 void fastforward_dj(char * message) {
 	char temp[5];
 	int ff1;
 	int ff2;
 
+    //get which song to fast forward from android command
 	sscanf(message, "%s %d %d", temp, &ff1, &ff2);
+    
+    //if song 1 needs to be fast forward
 	if (ff1 == 1) {
 		ff1 = 0;
+        
+        //if current position is less than 2,750,000 then set it to 3,000,000 (end of data) else add 250,000
 		if (m < 2750000) {
 			m += 250000;
 			size -= 125000;
@@ -537,13 +565,19 @@ void fastforward_dj(char * message) {
 			size -= (3000000 - m)/2;
 			m = 3000000;
 		}
+        
+        //play scratching effect
 		rwff=1;
 		if(song1edit==0)
 			size+=17429-(fx1point/2);
 		song1edit=1;
 	}
+    
+    //if song 2 needs to be fast forward
 	if (ff2 == 1) {
 		ff2 = 0;
+        
+        //if current position is less than 2,750,000 then set it to 3,000,000 (end of data) else add 250,000
 		if (i < 2750000) {
 			i += 250000;
 			smallsize -= 125000;
@@ -552,76 +586,105 @@ void fastforward_dj(char * message) {
 			i = 3000000;
 		}
 		rwff=2;
+        
+        //play scratching effect 
 		if(song2edit==0)
 			smallsize+=17429-(fx1point/2);
 		song2edit=1;
 	}
 }
 
+
+//Get volume from command sent by android
 void set_volume(char * message) {
 	int tempV;
 	char temp[20];
 	sscanf(message, "%s %d", temp, &tempV);
 	volume = tempV / 10;
 }
+
+
+//Dynamically play wav file
 void read_wav_buffer(char *name, int size) {
 
 	int fileHandle;
 	short dataRead;
+    
+    //malloc  to buffer
 	soundBuffer = (unsigned int *) malloc(sizeof(unsigned int) * buffer_size);
 	int q;
+    
+    //set soundbuffer to 0
 	for (q = 0; q < buffer_size; q++) {
 		soundBuffer[q] = 0;
 	}
-	//song x = getItemAt(songList, a+1);
-	//fileHandle2 = alt_up_sd_card_fopen(x.name, false);
+    
+    //get file handle
 	fileHandle = alt_up_sd_card_fopen(name, false);
-	//printf("filehandle: %d, filehandle2: %d", fileHandle, fileHandle2);
 	int j = 0;
 
 	stop_currently_playing = 0;
 	int whenToStart = buffer_size;
-	if (size / 2 < buffer_size) {
+	
+    //set size
+    if (size / 2 < buffer_size) {
 		whenToStart = size / 2;
 	}
 	unsigned int temp;
 	unsigned int temp2;
 	// Get first byte of file
 	dataRead = alt_up_sd_card_read(fileHandle);
-	while (dataRead > -1) {
+	
+    //keep reading till eof
+    while (dataRead > -1) {
+        
+        //if want to stop then break out of loop
 		if (stop_currently_playing == 1) {
 			break;
 		}
+        
+        //if song is playing then make sure do not override data that has not been consumed by audio buffer
 		if (started == 1) {
 			int x = 0;
-			while (pause == 1)
-				;
+            //if user wants to pause then stay in while loop
+			while (pause == 1);
+            
+            //make sure puttin data in buffer and consumption data is atleast 2 bytes apart
 			while (abs(y - k) < 2) {
 				x++;
 				if (x == 10000000) {
-
+                    //check if stuck in while loop
 					printf("help, im stuck, with value of y: %d and k: %d\n",
 							y, k);
 					alt_up_audio_reset_audio_core(audio_dev);
-					//k += 100;
 					break;
 				}
 			}
 		}
+        
+        //read 2 bytes of data from sd card
 		temp = dataRead;
 		dataRead = alt_up_sd_card_read(fileHandle);
 		temp2 = dataRead;
 		dataRead = alt_up_sd_card_read(fileHandle);
+        
+        //create one sample from 2 bytes
 		soundBuffer[y] = ((temp2 << 8 | temp));
+        
+        // take 2's compliment if sample is greater than 32768
 		if ((soundBuffer[y] & 0x8000) > 0) {
 			soundBuffer[y] = soundBuffer[y] | 0xFFFF0000; // 2's complement
 		}
+        
+        //if volume is zero then mute else set volume
 		if (volume == 0) {
 			soundBuffer[y] = 0;
 		} else {
 			soundBuffer[y] = soundBuffer[y] << volume;
 		}
 		y++;
+        
+        //reset position of where to read next sample when reached the end of buffer
 		if (y == whenToStart) {
 			if (started == 0) {
 				alt_up_audio_enable_write_interrupt(audio_dev);
@@ -634,15 +697,16 @@ void read_wav_buffer(char *name, int size) {
 	}
 
 	alt_up_sd_card_fclose(fileHandle);
-	//alt_up_sd_card_fclose(fileHandle2);
-	//a++;
 }
 
+//get absolute value of number
 int abs(int n) {
 	const int ret[2] = { n, -n };
 	return ret[n < 0];
 }
 
+
+// Read wav to buffer
 void read_wav(char*name, unsigned int size, unsigned char * soundbuff) {
 	int j = 0;
 	int fileHandle;
@@ -664,6 +728,8 @@ void read_wav(char*name, unsigned int size, unsigned char * soundbuff) {
 	alt_up_sd_card_fclose(fileHandle);
 }
 
+
+//COnfigure audio device
 void configure_audio() {
 	alt_up_av_config_dev* audio_config;
 	audio_config = alt_up_av_config_open_dev(AUDIO_AND_VIDEO_CONFIG_0_NAME);

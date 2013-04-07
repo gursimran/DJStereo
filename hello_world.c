@@ -1,9 +1,12 @@
-#include <stdlib.h>
-#include <system.h>
+//Global Variables
 volatile char playSong = 0;
 volatile char djplaysong=0;
 volatile char stop_currently_playing = 0;
 volatile char pause = 0;volatile char startedSendingList = 0;
+
+//Files
+#include <stdlib.h>
+#include <system.h>
 #include "altera_up_sd_card_avalon_interface.h"
 #include <stdio.h>
 #include "altera_up_avalon_rs232.h"
@@ -15,28 +18,27 @@ volatile char pause = 0;volatile char startedSendingList = 0;
 #include "Timer.h"
 
 
-
-
 int main(){
 
 	//Initializing components that run sound
 	configure_audio();
-	//sound = (unsigned int *)malloc(1000000*sizeof(unsigned int));
 
 	//Initialize songList to null
 	songList = NULL;
 
-	//Read songs from SD card
+	//Read song list from SD card
 	readSongsFromSDCard();
 
 	//init timer
 	init_Timer();
 
-
-
+    
+    //print first 3 songs of song list
 	song_string(songList);
 	printf("%s\n", songString);
 
+    
+    //If user wants to play dj or regular song
 	while(1){
 		if (playSong == 1){
 			printf("gonna play song\n");
@@ -51,4 +53,3 @@ int main(){
 	}
 
 }
-

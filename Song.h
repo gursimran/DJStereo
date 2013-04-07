@@ -1,3 +1,5 @@
+//SONG STRUCT WITH ALL DATA FOR EACH SONG
+
 typedef struct song {
   char name[20];
   int ID;

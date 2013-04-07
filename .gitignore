@@ -8,3 +8,4 @@ module2.elf
 module2.map
 module2.objdump
 obj/
+._*
